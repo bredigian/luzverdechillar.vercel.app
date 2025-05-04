@@ -3,4 +3,5 @@ export interface ServiceProps {
   type: string
   description: string
   cost: number | null
+  quantity?: number
 }
