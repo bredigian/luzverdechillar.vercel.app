@@ -45,7 +45,10 @@ export default function EstimateItem({ data }: Props) {
       >
         <Card className="bg-card/50 hover:bg-card/100 duration-200 ease-in-out cursor-pointer">
           <CardHeader>
-            <CardTitle>{personFullname}</CardTitle>
+            <CardTitle className="flex items-center justify-between gap-4">
+              <span>{personFullname}</span>
+              <Badge variant={"default"}>{totalCostString}</Badge>
+            </CardTitle>
             <CardDescription hidden></CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
@@ -54,12 +57,11 @@ export default function EstimateItem({ data }: Props) {
               <ArrowRight className="size-4" />
               <span>{dateToString}</span>
             </Badge>
-            <Badge variant={"default"}>{totalCostString}</Badge>
-          </CardContent>
-          <CardFooter>
-            <p className="text-sm font-extralight opacity-50">
+            <Badge variant={"outline"} className="font-extralight opacity-50">
               Creado el {createdAtString}
-            </p>
+            </Badge>
+          </CardContent>
+          <CardFooter hidden>
             <Image
               id="luz_verde_chillar_logo"
               hidden
