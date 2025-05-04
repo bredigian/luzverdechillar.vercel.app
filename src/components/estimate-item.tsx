@@ -14,6 +14,7 @@ import { Badge } from "./ui/badge"
 import { EstimateProps } from "@/types/estimates.types"
 import Image from "next/image"
 import { Service } from "@/services/pdf.services"
+import { Skeleton } from "./ui/skeleton"
 import { format } from "date-fns"
 import logo from "@/assets/logo.webp"
 
@@ -71,6 +72,27 @@ export default function EstimateItem({ data }: Props) {
           </CardFooter>
         </Card>
       </button>
+    </li>
+  )
+}
+
+export const EstimateItemSkeleton = () => {
+  return (
+    <li className="col-span-full">
+      <Card className="bg-card/50 hover:bg-card/100 duration-200 ease-in-out">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between gap-4">
+            <Skeleton className="w-24 h-6" />
+            <Skeleton className="w-24 h-5" />
+          </CardTitle>
+          <CardDescription hidden></CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2">
+          <Skeleton className="w-54 h-5" />
+          <Skeleton className="w-48 h-5" />
+        </CardContent>
+        <CardFooter hidden></CardFooter>
+      </Card>
     </li>
   )
 }
