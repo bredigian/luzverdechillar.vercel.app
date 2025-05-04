@@ -85,10 +85,10 @@ export const Service: Props = {
       })
 
       pdf.save(
-        `LUZ_VERDE_CHILLAR-PRESUPUESTO_${createdAtString.replace(
+        `LUZ_VERDE_CHILLAR_PRESUPUESTO_${createdAtString.replaceAll(
           "/",
           "-"
-        )}_${personFullname.toUpperCase().replace(" ", "_")}.pdf`
+        )}_${personFullname.toUpperCase().replaceAll(" ", "_")}.pdf`
       )
     } catch (e) {
       if (e instanceof Error) toast.error(e.message, { position: "top-center" })

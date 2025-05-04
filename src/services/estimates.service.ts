@@ -37,4 +37,19 @@ export const Service = {
 
     return data as EstimateProps[]
   },
+  deleteEstimate: async (_id: EstimateProps["_id"]) => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL
+    const PATH = `/v1/estimates?_id=${_id}`
+    const URL = `${API_URL}${PATH}`
+
+    const res = await fetch(URL, {
+      method: "DELETE",
+    })
+
+    const data: EstimateProps | ErrorResponseProps = await res.json()
+
+    if (!res.ok) throw data as ErrorResponseProps
+
+    return data as EstimateProps
+  },
 }

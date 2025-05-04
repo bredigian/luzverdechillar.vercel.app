@@ -25,6 +25,17 @@ interface Props {
   description?: string
   triggerButtonText: string
   icon?: ReactNode
+  variant?:
+    | "link"
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | null
+    | undefined
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export default function DialogAdaptative({
@@ -33,13 +44,16 @@ export default function DialogAdaptative({
   description,
   triggerButtonText,
   icon,
+  variant,
+  open,
+  onOpenChange,
 }: Props) {
   const isMobile = useIsMobile()
 
   return isMobile ? (
-    <Drawer closeThreshold={1}>
+    <Drawer open={open} onOpenChange={onOpenChange} closeThreshold={1}>
       <DrawerTrigger asChild>
-        <Button>
+        <Button variant={variant}>
           {icon && icon}
           {triggerButtonText}
         </Button>
@@ -55,9 +69,9 @@ export default function DialogAdaptative({
       </DrawerContent>
     </Drawer>
   ) : (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button>
+        <Button variant={variant}>
           {icon && icon}
           {triggerButtonText}
         </Button>
