@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button"
 import EstimateFormDialog from "@/components/estimate-form"
+import EstimatesContainer from "@/components/estimates-container"
 import Screen from "@/components/layout/screen"
 import { Service } from "@/services/categories.service"
+import { Suspense } from "react"
 
 export default async function EstimatesPage() {
   const categories = await Service.getCategories()
-
-  console.log(categories)
 
   return (
     <Screen className="flex-col gap-4">
@@ -20,6 +20,9 @@ export default async function EstimatesPage() {
           <EstimateFormDialog categories={categories} />
         )}
       </aside>
+      <Suspense fallback={<>Loading...</>}>
+        <EstimatesContainer />
+      </Suspense>
     </Screen>
   )
 }

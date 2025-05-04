@@ -1,7 +1,6 @@
-import { FC, ReactNode } from "react"
-
 import InputWarning from "./warning"
 import { Label } from "./ui/label"
+import { ReactNode } from "react"
 
 interface Props {
   label: string

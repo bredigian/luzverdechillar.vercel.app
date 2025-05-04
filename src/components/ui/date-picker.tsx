@@ -1,16 +1,13 @@
-import {
-  DateRange,
-  SelectRangeEventHandler,
-  SelectSingleEventHandler,
-} from "react-day-picker"
+import { DateRange, SelectRangeEventHandler } from "react-day-picker"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover"
 
 import { Button } from "./button"
 import { Calendar } from "./calendar"
 import { CalendarIcon } from "lucide-react"
-import InputWarning from "../warning"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
+
+// import InputWarning from "../warning"
 
 interface Props {
   date?: DateRange

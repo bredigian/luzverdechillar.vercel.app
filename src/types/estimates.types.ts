@@ -6,7 +6,7 @@ interface PersonProps {
 }
 
 export interface EstimateProps {
-  id?: string
+  _id?: string
   person: PersonProps
   from: Date
   to: Date

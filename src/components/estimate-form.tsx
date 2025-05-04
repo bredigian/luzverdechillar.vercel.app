@@ -8,12 +8,11 @@ import {
   Plus,
   Trash,
 } from "lucide-react"
-import { Controller, useForm } from "react-hook-form"
-import CurrencyInput, { formatValue } from "react-currency-input-field"
 import { useEffect, useState } from "react"
 
 import { Button } from "./ui/button"
 import { CategoryProps } from "@/types/categories.types"
+import CurrencyInput from "react-currency-input-field"
 import CustomInput from "./custom-input"
 import { DateRange } from "react-day-picker"
 import { DateRangePicker } from "./ui/date-picker"
@@ -21,14 +20,15 @@ import DialogAdaptative from "./adaptative-dialog"
 import { ErrorResponseProps } from "@/types/responses.types"
 import { EstimateProps } from "@/types/estimates.types"
 import { Input } from "./ui/input"
-import InputWarning from "./warning"
 import { Label } from "./ui/label"
+import { Service as PDFService } from "@/services/pdf.services"
 import { SelectWithSearch } from "./ui/select-with-search"
 import { Service } from "@/services/estimates.service"
 import Warning from "./warning"
 import { cn } from "@/lib/utils"
 import revalidate from "@/lib/actions"
 import { toast } from "sonner"
+import { useForm } from "react-hook-form"
 import { useServicesController } from "@/hooks/use-services"
 
 interface Props {
@@ -41,7 +41,6 @@ function EstimateForm({ categories }: Props) {
   const [status, setStatus] = useState<FORM_STATUS>("pending")
 
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -63,7 +62,7 @@ function EstimateForm({ categories }: Props) {
     deleteService,
     handleChangeSelectValue,
     handleChangeServiceQuantity,
-    handleUpdateSelectedServicesOnLocalStorage,
+    // handleUpdateSelectedServicesOnLocalStorage,
     clearAll,
   } = useServicesController()
 
@@ -75,10 +74,12 @@ function EstimateForm({ categories }: Props) {
     deleteService: extraDeleteService,
     handleChangeSelectValue: extraHandleChangeSelectValue,
     handleChangeServiceQuantity: extraHandleChangeServiceQuantity,
-    handleUpdateSelectedServicesOnLocalStorage:
-      extraHandleUpdateSelectedServicesOnLocalStorage,
+    // handleUpdateSelectedServicesOnLocalStorage:
+    //   extraHandleUpdateSelectedServicesOnLocalStorage,
     clearAll: extraClearAll,
   } = useServicesController(true)
+
+  const [createdEstimate, setCreatedEstimated] = useState<EstimateProps>()
 
   const onSubmit = async (formData: EstimateProps) => {
     if (!dateRange?.from || !dateRange?.to) {
@@ -112,9 +113,14 @@ function EstimateForm({ categories }: Props) {
 
     try {
       setStatus("processing")
-      await Service.generateEstimate(PAYLOAD)
-      setStatus("success")
+
+      const created = await Service.generateEstimate(PAYLOAD)
+      setCreatedEstimated(created)
+
       await revalidate("estimates")
+
+      toast.success("Prespuesto creado con éxito", { position: "top-center" })
+      setStatus("success")
     } catch (e) {
       setStatus("pending")
 
@@ -387,7 +393,9 @@ function EstimateForm({ categories }: Props) {
       <Button
         type={status === "success" ? "button" : "submit"}
         onClick={() => {
-          if (status === "success") console.log("Exportando...")
+          if (status === "success")
+            if (createdEstimate)
+              PDFService.generatePDF(createdEstimate as EstimateProps)
         }}
         disabled={status === "processing"}
         className="font-bold"

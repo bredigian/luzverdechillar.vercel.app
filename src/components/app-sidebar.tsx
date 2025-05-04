@@ -49,6 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   src={logo}
                   alt="Logo de Luz Verde Chillar"
                   className="rounded-full"
+                  id="luz_verde_chillar_logo"
                 />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
