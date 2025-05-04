@@ -12,6 +12,7 @@ import { useEffect, useState } from "react"
 
 import { Button } from "./ui/button"
 import { CategoryProps } from "@/types/categories.types"
+import { Checkbox } from "./ui/checkbox"
 import CurrencyInput from "react-currency-input-field"
 import CustomInput from "./custom-input"
 import { DateRange } from "react-day-picker"
@@ -153,9 +154,11 @@ function EstimateForm({ categories }: Props) {
       setDateRangeError(false)
   }, [dateRange])
 
+  const [showPDF, setShowPDF] = useState(false)
+
   return (
     <form
-      className="flex flex-col gap-4 px-4 pb-4"
+      className="relative flex flex-col gap-4 px-4 pt-2 pb-4 max-h-[684px] overflow-y-auto"
       onSubmit={handleSubmit(onSubmit)}
       data-vaul-no-drag
     >
@@ -205,7 +208,7 @@ function EstimateForm({ categories }: Props) {
       />
       <div className="flex flex-col gap-4">
         <aside className="flex items-center justify-between gap-4">
-          <Label className="grow">Servicios</Label>
+          <Label className="grow">Servicios (electro instalador)</Label>
           {servicesError && <Warning message="Incompleto" />}
           <Button
             variant={"destructive"}
@@ -288,6 +291,20 @@ function EstimateForm({ categories }: Props) {
           ))}
         </ul>
       </div>
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="show-data-pdf"
+          checked={showPDF}
+          onCheckedChange={() => setShowPDF(!showPDF)}
+        />
+        <Label htmlFor="show-data-pdf">Mostrar PDF de AAIERIC</Label>
+      </div>
+      {showPDF && (
+        <iframe
+          src={process.env.NEXT_PUBLIC_IFRAME_DATA_URL!}
+          className="w-full h-44 rounded-md"
+        ></iframe>
+      )}
       <div className="flex flex-col gap-4">
         <aside className="flex items-center justify-between gap-4">
           <Label className="grow">Extras</Label>
@@ -398,7 +415,7 @@ function EstimateForm({ categories }: Props) {
               PDFService.generatePDF(createdEstimate as EstimateProps)
         }}
         disabled={status === "processing"}
-        className="font-bold"
+        className="font-bold sticky bottom-0 w-full"
       >
         {status === "pending" ? (
           <>
