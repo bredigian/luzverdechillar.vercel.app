@@ -103,11 +103,11 @@ export default function EstimateItem({ data }: Props) {
   ).toString()
 
   return (
-    <li className="col-span-full">
+    <li className="col-span-full lg:col-span-2 2xl:col-span-1">
       <Card className="w-full bg-card/50 hover:bg-card/100 duration-200 ease-in-out">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between gap-4">
-            <span className="grow">{personFullname}</span>
+          <CardTitle className="flex items-center justify-between gap-4 truncate">
+            <span className="grow truncate">{personFullname}</span>
             <Badge variant={"default"}>{totalCostString}</Badge>
             <Popover>
               <PopoverTrigger asChild>
@@ -166,7 +166,7 @@ export default function EstimateItem({ data }: Props) {
 
 export const EstimateItemSkeleton = () => {
   return (
-    <li className="col-span-full">
+    <li className="col-span-full lg:col-span-2 2xl:col-span-1">
       <Card className="bg-card/50 hover:bg-card/100 duration-200 ease-in-out">
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-4">
