@@ -34,6 +34,7 @@ export function DateRangePicker({
             !date && "text-muted-foreground"
           )}
           disabled={disabled}
+          type="button"
         >
           <CalendarIcon />
           {date?.from && date?.to ? (

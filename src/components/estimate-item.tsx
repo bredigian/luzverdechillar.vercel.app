@@ -10,17 +10,18 @@ import {
   CardTitle,
 } from "./ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { format, set } from "date-fns"
 
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import DialogAdaptative from "./adaptative-dialog"
 import { ErrorResponseProps } from "@/types/responses.types"
 import { EstimateProps } from "@/types/estimates.types"
+import EstimateUpdateFormDialog from "./estimate-update-form"
 import { Service as EstimatesService } from "@/services/estimates.service"
 import Image from "next/image"
 import { Service } from "@/services/pdf.services"
 import { Skeleton } from "./ui/skeleton"
+import { format } from "date-fns"
 import logo from "@/assets/logo.webp"
 import revalidate from "@/lib/actions"
 import { toast } from "sonner"
@@ -111,23 +112,17 @@ export default function EstimateItem({ data }: Props) {
             <Badge variant={"default"}>{totalCostString}</Badge>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  size={"icon"}
-                  onClick={(e) => e.stopPropagation()}
-                  onBlur={(e) => e.stopPropagation()}
-                >
+                <Button variant={"outline"} size={"icon"}>
                   <Settings2 />
                 </Button>
               </PopoverTrigger>
               <PopoverContent
                 align="end"
                 className="max-w-fit flex flex-col items-end gap-4"
-                onClick={(e) => e.stopPropagation()}
-                onBlur={(e) => e.stopPropagation()}
               >
                 <span className="text-sm font-semibold">Opciones</span>
                 <div className="flex flex-col gap-2">
+                  <EstimateUpdateFormDialog data={data} />
                   <Button
                     variant={"secondary"}
                     onClick={() => Service.generatePDF(data)}
