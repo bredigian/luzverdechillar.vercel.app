@@ -158,7 +158,7 @@ function EstimateForm({ categories }: Props) {
 
   return (
     <form
-      className="relative flex flex-col gap-4 px-4 pt-2 pb-4 max-h-[684px] overflow-y-auto"
+      className="relative flex flex-col gap-4 px-4 pt-2 pb-4 max-h-[684px] md:max-h-max overflow-y-auto md:pb-0 md:px-0"
       onSubmit={handleSubmit(onSubmit)}
       data-vaul-no-drag
     >
@@ -175,6 +175,7 @@ function EstimateForm({ categories }: Props) {
               className="text-sm"
               type="text"
               placeholder="Ej: Juan"
+              disabled={status === "success"}
             />
           }
           error={errors?.person?.firstName?.message}
@@ -191,6 +192,7 @@ function EstimateForm({ categories }: Props) {
               className="text-sm"
               type="text"
               placeholder="Ej: Pérez"
+              disabled={status === "success"}
             />
           }
           error={errors?.person?.lastName?.message}
@@ -205,6 +207,7 @@ function EstimateForm({ categories }: Props) {
         setDate={setDateRange}
         placeholder="Seleccioná el rango de fechas estimativo"
         align="start"
+        disabled={status === "success"}
       />
       <div className="flex flex-col gap-4">
         <aside className="flex items-center justify-between gap-4">
@@ -215,10 +218,16 @@ function EstimateForm({ categories }: Props) {
             size={"icon"}
             type="button"
             onClick={clearAll}
+            disabled={status === "success"}
           >
             <BrushCleaning />
           </Button>
-          <Button variant={"outline"} type="button" onClick={addService}>
+          <Button
+            variant={"outline"}
+            type="button"
+            onClick={addService}
+            disabled={status === "success"}
+          >
             <Plus />
             Ítem
           </Button>
@@ -235,18 +244,21 @@ function EstimateForm({ categories }: Props) {
                 handleChangeSelectValue={handleChangeSelectValue}
                 index={index}
                 selectedServices={selectedServices}
+                disabled={status === "success"}
               />
               <div className="relative flex items-center !w-32">
                 <span
                   className={cn(
                     "absolute pl-3 pt-0.5",
-                    !selectedService._id ? "opacity-50" : "opacity-100"
+                    !selectedService._id || status === "success"
+                      ? "opacity-50"
+                      : "opacity-100"
                   )}
                 >
                   $
                 </span>
                 <CurrencyInput
-                  disabled={!selectedService._id}
+                  disabled={!selectedService._id || status === "success"}
                   defaultValue={selectedService.cost ?? 0}
                   decimalsLimit={2}
                   allowDecimals={false}
@@ -278,11 +290,12 @@ function EstimateForm({ categories }: Props) {
                     selectedService._id as string
                   )
                 }
+                disabled={!selectedService._id || status === "success"}
               />
               <Button
                 size={"icon"}
                 type="button"
-                disabled={selectedServices.length <= 1}
+                disabled={selectedServices.length <= 1 || status === "success"}
                 onClick={() => deleteService(index)}
               >
                 <Trash />
@@ -296,6 +309,7 @@ function EstimateForm({ categories }: Props) {
           id="show-data-pdf"
           checked={showPDF}
           onCheckedChange={() => setShowPDF(!showPDF)}
+          disabled={status === "success"}
         />
         <Label htmlFor="show-data-pdf">Mostrar PDF de AAIERIC</Label>
       </div>
@@ -314,10 +328,16 @@ function EstimateForm({ categories }: Props) {
             size={"icon"}
             type="button"
             onClick={extraClearAll}
+            disabled={status === "success"}
           >
             <BrushCleaning />
           </Button>
-          <Button variant={"outline"} type="button" onClick={extraAddService}>
+          <Button
+            variant={"outline"}
+            type="button"
+            onClick={extraAddService}
+            disabled={status === "success"}
+          >
             <Plus />
             Extra
           </Button>
@@ -351,18 +371,21 @@ function EstimateForm({ categories }: Props) {
                       index
                     )
                   }
+                  disabled={status === "success"}
                 />
                 <div className="relative flex items-center">
                   <span
                     className={cn(
                       "absolute pl-3 pt-0.5",
-                      !extraService._id ? "opacity-50" : "opacity-100"
+                      !extraService._id || status === "success"
+                        ? "opacity-50"
+                        : "opacity-100"
                     )}
                   >
                     $
                   </span>
                   <CurrencyInput
-                    disabled={!extraService.description}
+                    disabled={!extraService._id || status === "success"}
                     defaultValue={extraService.cost ?? 0}
                     decimalsLimit={2}
                     allowDecimals={false}
@@ -394,11 +417,13 @@ function EstimateForm({ categories }: Props) {
                       extraService._id as string
                     )
                   }
+                  disabled={!extraService.description || status === "success"}
                 />
                 <Button
                   size={"icon"}
                   type="button"
                   onClick={() => extraDeleteService(index)}
+                  disabled={status === "success"}
                 >
                   <Trash />
                 </Button>

@@ -40,6 +40,9 @@ function DeleteEstimate({ _id }: { _id: EstimateProps["_id"] }) {
       await EstimatesService.deleteEstimate(_id)
 
       setStatus("success")
+      toast.success("Presupuesto eliminado con éxito", {
+        position: "top-center",
+      })
       handleOpen()
       setTimeout(async () => {
         await revalidate("estimates")
@@ -64,7 +67,7 @@ function DeleteEstimate({ _id }: { _id: EstimateProps["_id"] }) {
     >
       <Button
         variant={"destructive"}
-        className="mx-4 mb-4"
+        className="mx-4 mb-4 md:m-0 md:w-fit md:ml-auto"
         onClick={handleDelete}
         disabled={status === "processing" || status === "success"}
       >
@@ -101,10 +104,10 @@ export default function EstimateItem({ data }: Props) {
 
   return (
     <li className="col-span-full">
-      <Card className="w-full bg-card/50 hover:bg-card/100 duration-200 ease-in-out cursor-pointer">
+      <Card className="w-full bg-card/50 hover:bg-card/100 duration-200 ease-in-out">
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-4">
-            <span>{personFullname}</span>
+            <span className="grow">{personFullname}</span>
             <Badge variant={"default"}>{totalCostString}</Badge>
             <Popover>
               <PopoverTrigger asChild>

@@ -21,6 +21,7 @@ interface Props {
   index: number
   handleChangeSelectValue: (value: ServiceProps, index: number) => void
   selectedServices: ServiceProps[]
+  disabled?: boolean
 }
 
 export function SelectWithSearch({
@@ -29,6 +30,7 @@ export function SelectWithSearch({
   index,
   handleChangeSelectValue,
   selectedServices,
+  disabled,
 }: Props) {
   const [open, setOpen] = useState(false)
 
@@ -60,6 +62,7 @@ export function SelectWithSearch({
           role="combobox"
           aria-expanded={open}
           className="min-w-0 w-32 grow justify-between"
+          disabled={disabled}
         >
           <span className="truncate">
             {value ? text : "Selecciona un servicio..."}
@@ -69,7 +72,10 @@ export function SelectWithSearch({
       </PopoverTrigger>
       <PopoverContent align="start" className="w-[305px] p-0">
         <Command>
-          <CommandInput placeholder="Busca un servicio..." />
+          <CommandInput
+            placeholder="Busca un servicio..."
+            disabled={disabled}
+          />
           <CommandList>
             <CommandEmpty>No se encontró ningún servicio.</CommandEmpty>
             {data.map((category) => {
@@ -93,8 +99,8 @@ export function SelectWithSearch({
                           handleChangeSelectValue(service, index)
                           setOpen(false)
                         }}
-                        className="flex items-center justify-between"
-                        disabled={isDisabled}
+                        className="flex items-center justify-between cursor-pointer"
+                        disabled={disabled || isDisabled}
                       >
                         <span>
                           {service.description}{" "}

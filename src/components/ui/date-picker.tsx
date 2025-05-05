@@ -14,46 +14,16 @@ interface Props {
   setDate: SelectRangeEventHandler
   placeholder?: string
   align?: "start" | "end" | "center"
+  disabled?: boolean
 }
 
-// export function DatePicker({
-//   date,
-//   setDate,
-//   placeholder,
-//   align,
-//   error,
-// }: Props) {
-//   return (
-//     <Popover>
-//       <PopoverTrigger asChild>
-//         <Button
-//           variant={"outline"}
-//           className={cn(
-//             "col-span-1 w-full justify-start text-left font-normal",
-//             !date && "text-muted-foreground"
-//           )}
-//         >
-//           <CalendarIcon />
-//           {date ? (
-//             format(date, "dd/MM/yyyy")
-//           ) : (
-//             <span>{placeholder ?? "Selecciona una fecha"}</span>
-//           )}
-//         </Button>
-//       </PopoverTrigger>
-//       <PopoverContent className="w-auto p-0" align={align ?? "start"}>
-//         <Calendar
-//           mode="single"
-//           selected={date}
-//           onSelect={setDate}
-//           initialFocus
-//         />
-//       </PopoverContent>
-//     </Popover>
-//   )
-// }
-
-export function DateRangePicker({ date, setDate, placeholder, align }: Props) {
+export function DateRangePicker({
+  date,
+  setDate,
+  placeholder,
+  align,
+  disabled,
+}: Props) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -63,6 +33,7 @@ export function DateRangePicker({ date, setDate, placeholder, align }: Props) {
             "col-span-1 w-full justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
+          disabled={disabled}
         >
           <CalendarIcon />
           {date?.from && date?.to ? (
@@ -81,6 +52,7 @@ export function DateRangePicker({ date, setDate, placeholder, align }: Props) {
           mode="range"
           selected={date}
           onSelect={setDate}
+          disabled={disabled}
         />
       </PopoverContent>
     </Popover>
