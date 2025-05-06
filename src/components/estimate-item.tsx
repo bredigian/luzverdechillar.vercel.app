@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, FileDown, Loader2, Settings2, Trash } from "lucide-react"
+import { ArrowRight, Loader2, Settings2, Trash } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -15,11 +15,11 @@ import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import DialogAdaptative from "./adaptative-dialog"
 import { ErrorResponseProps } from "@/types/responses.types"
+import EstimatePDFDialog from "./estimate-dialog"
 import { EstimateProps } from "@/types/estimates.types"
 import EstimateUpdateFormDialog from "./estimate-update-form"
 import { Service as EstimatesService } from "@/services/estimates.service"
 import Image from "next/image"
-import { Service } from "@/services/pdf.services"
 import { Skeleton } from "./ui/skeleton"
 import { format } from "date-fns"
 import logo from "@/assets/logo.webp"
@@ -123,12 +123,7 @@ export default function EstimateItem({ data }: Props) {
                 <span className="text-sm font-semibold">Opciones</span>
                 <div className="flex flex-col gap-2">
                   <EstimateUpdateFormDialog data={data} />
-                  <Button
-                    variant={"secondary"}
-                    onClick={() => Service.generatePDF(data)}
-                  >
-                    <FileDown /> Exportar PDF
-                  </Button>
+                  <EstimatePDFDialog data={data} />
                   <DeleteEstimate _id={data._id} />
                 </div>
               </PopoverContent>

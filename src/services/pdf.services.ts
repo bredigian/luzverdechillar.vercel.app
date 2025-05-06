@@ -5,11 +5,11 @@ import jsPDF from "jspdf"
 import { toast } from "sonner"
 
 interface Props {
-  generatePDF: (data: EstimateProps) => void
+  generatePDF: (data: EstimateProps, generateURL?: boolean) => string | null
 }
 
 export const Service: Props = {
-  generatePDF: (data) => {
+  generatePDF: (data, generateURL) => {
     const personFullname = `${data.person.firstName} ${data.person.lastName}`
     const dateFromString = format(data.from, "dd/MM/yyyy").toString()
     const dateToString = format(data.to, "dd/MM/yyyy").toString()
@@ -84,14 +84,21 @@ export const Service: Props = {
         startY: 96,
       })
 
-      pdf.save(
-        `LUZ_VERDE_CHILLAR_PRESUPUESTO_${createdAtString.replaceAll(
-          "/",
-          "-"
-        )}_${personFullname.toUpperCase().replaceAll(" ", "_")}.pdf`
-      )
+      const pdfBlob = pdf.output("blob")
+      const pdfURL = URL.createObjectURL(pdfBlob)
+
+      if (!generateURL)
+        pdf.save(
+          `LUZ_VERDE_CHILLAR_PRESUPUESTO_${createdAtString.replaceAll(
+            "/",
+            "-"
+          )}_${personFullname.toUpperCase().replaceAll(" ", "_")}.pdf`
+        )
+
+      return pdfURL
     } catch (e) {
       if (e instanceof Error) toast.error(e.message, { position: "top-center" })
+      return null
     }
   },
 }
