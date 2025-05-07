@@ -1,7 +1,7 @@
 "use client"
 
 import { Avatar, AvatarFallback } from "./ui/avatar"
-import { ChevronRight, ChevronsUpDown, LogOut } from "lucide-react"
+import { ChevronRight, ChevronsUpDown, LogOut, Moon, Sun } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,17 +23,21 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
+import { Button } from "./ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { ROUTES } from "@/routes"
 import logo from "@/assets/logo.webp"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { usePathname } from "next/navigation"
+import { useTheme } from "next-themes"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const isActive = (path: string) => pathname === path
   const isMobile = useIsMobile()
+
+  const { setTheme } = useTheme()
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -125,6 +129,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                      Tema
+                    </DropdownMenuItem>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem onClick={() => setTheme("light")}>
+                      Claro
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("dark")}>
+                      Oscuro
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                      Sistema
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <DropdownMenuItem className="cursor-pointer">
                   <LogOut />
                   Cerrar sesión
