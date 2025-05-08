@@ -10,11 +10,13 @@ export default function Home() {
       <Card className="w-11/12 sm:w-96">
         <CardHeader hidden></CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Image
-            src={logo}
-            alt="Logo de Luz Verde Chillar"
-            className="size-24 rounded-full self-center"
-          />
+          <div className="size-24 self-center rounded-full overflow-hidden bg-white p-3">
+            <Image
+              src={logo}
+              alt="Logo de Luz Verde Chillar"
+              className="size-full"
+            />
+          </div>
           <h1 className="self-center font-semibold">Luz Verde Chillar</h1>
           <SigninForm />
         </CardContent>
