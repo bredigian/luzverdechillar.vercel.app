@@ -8,6 +8,11 @@ interface Props {
   generatePDF: (data: EstimateProps, generateURL?: boolean) => string | null
 }
 
+enum ORDER_PRIORITY {
+  MATERIAL = 2,
+  EXTRA = 3,
+}
+
 export const Service: Props = {
   generatePDF: (data, generateURL) => {
     const personFullname = `${data.person.firstName} ${data.person.lastName}`
@@ -44,7 +49,7 @@ export const Service: Props = {
 
       pdf
         .setFontSize(11)
-        .text("Presupuesto generado por Yaco Mehring", 194, 56, {
+        .text("Presupuesto realizado por Yaco Mehring", 194, 56, {
           align: "right",
         })
 
@@ -64,21 +69,34 @@ export const Service: Props = {
         theme: "grid",
         head: [["Tipo", "Descripción", "Cantidad", "Precio uni.", "Subtotal"]],
         headStyles: { fillColor: "#f3f3f3", textColor: "#000000" },
-        body: data.services.map((service) => [
-          service.type.toUpperCase(),
-          service.description || "",
-          service.quantity || 0,
-          Intl.NumberFormat("es-AR", {
-            style: "currency",
-            currency: "ARS",
-            minimumFractionDigits: 2,
-          }).format(service.cost as number),
-          Intl.NumberFormat("es-AR", {
-            style: "currency",
-            currency: "ARS",
-            minimumFractionDigits: 2,
-          }).format((service.cost as number) * (service.quantity as number)),
-        ]),
+        body: data.services
+          .sort((a, b) => {
+            const orderA: number =
+              ORDER_PRIORITY[
+                a.type.toUpperCase() as keyof typeof ORDER_PRIORITY
+              ] || 1
+            const orderB: number =
+              ORDER_PRIORITY[
+                b.type.toUpperCase() as keyof typeof ORDER_PRIORITY
+              ] || 1
+
+            return orderA - orderB
+          })
+          .map((service) => [
+            service.type.toUpperCase(),
+            service.description || "",
+            service.quantity || 0,
+            Intl.NumberFormat("es-AR", {
+              style: "currency",
+              currency: "ARS",
+              minimumFractionDigits: 2,
+            }).format(service.cost as number),
+            Intl.NumberFormat("es-AR", {
+              style: "currency",
+              currency: "ARS",
+              minimumFractionDigits: 2,
+            }).format((service.cost as number) * (service.quantity as number)),
+          ]),
         foot: [["", "", "", "TOTAL", totalCostString]],
         footStyles: { fillColor: "#000000" },
         startY: 96,

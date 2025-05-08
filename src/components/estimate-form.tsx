@@ -8,6 +8,15 @@ import {
   Plus,
   Trash,
 } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select"
 import { useEffect, useState } from "react"
 
 import { Button } from "./ui/button"
@@ -365,7 +374,7 @@ function EstimateForm({ categories }: Props) {
                       {
                         _id: `extra_${index}`,
                         description: target.value,
-                        type: "Extra",
+                        type: extraService.type || "Extra",
                         cost: extraService.cost,
                       },
                       index
@@ -419,6 +428,36 @@ function EstimateForm({ categories }: Props) {
                   }
                   disabled={!extraService.description || status === "success"}
                 />
+                <Select
+                  onValueChange={(value) => {
+                    extraHandleChangeSelectValue(
+                      {
+                        _id: `extra_${index}`,
+                        description: extraService.description,
+                        type: value === "M" ? "Material" : "Extra",
+                        cost: extraService.cost,
+                      },
+                      index
+                    )
+                  }}
+                  defaultValue="E"
+                >
+                  <SelectTrigger className="max-w-16">
+                    <SelectValue placeholder="E" />
+                  </SelectTrigger>
+                  <SelectContent align="end">
+                    <SelectGroup>
+                      <SelectLabel>Tipo</SelectLabel>
+                      <SelectItem value="M">
+                        <strong>M</strong> (Material)
+                      </SelectItem>
+                      <SelectItem value="E">
+                        <strong>E</strong> (Extra)
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
                 <Button
                   size={"icon"}
                   type="button"

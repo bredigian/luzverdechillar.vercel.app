@@ -30,12 +30,13 @@ export default function SigninForm() {
   const onSubmit = async (payload: SigninFormProps) => {
     try {
       setState("processing")
-      const { username, firstName, lastName, access_token } =
+      const { username, firstName, lastName, access_token, exp } =
         await Service.signin(payload)
       setState("success")
       Cookie.set(
         "userdata",
-        JSON.stringify({ access_token, username, firstName, lastName })
+        JSON.stringify({ access_token, username, firstName, lastName }),
+        { expires: exp }
       )
       push("/dashboard/estimates")
     } catch (error) {

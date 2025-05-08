@@ -11,4 +11,5 @@ export interface UserProps extends SigninFormProps {
 
 export interface SessionProps extends UserProps {
   access_token: string
+  exp: number
 }
