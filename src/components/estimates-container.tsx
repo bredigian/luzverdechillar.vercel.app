@@ -26,9 +26,19 @@ export default async function EstimatesContainer({ filter }: Props) {
 
   return (
     <ul className="grid grid-cols-4 gap-4">
-      {filteredData.map((estimate) => (
-        <EstimateItem key={estimate._id} data={estimate} />
-      ))}
+      {estimates.length === 0 ? (
+        <li className="col-span-full font-thin">
+          No se han registrado prespuestos todavia.
+        </li>
+      ) : filteredData.length === 0 ? (
+        <li className="col-span-full font-thin">
+          No se encontraron resultados para <strong>{filter}</strong>
+        </li>
+      ) : (
+        filteredData.map((estimate) => (
+          <EstimateItem key={estimate._id} data={estimate} />
+        ))
+      )}
     </ul>
   )
 }
