@@ -13,6 +13,7 @@ export const useServicesController = (isOptional?: boolean) => {
             _id: "",
             description: "",
             cost: 0,
+            originalCost: 0,
             quantity: 1,
             type: "",
           } as ServiceProps,
@@ -27,6 +28,7 @@ export const useServicesController = (isOptional?: boolean) => {
         _id: "",
         description: "",
         cost: 0,
+        originalCost: 0,
         quantity: 1,
         type: "",
       } as ServiceProps,
@@ -43,6 +45,7 @@ export const useServicesController = (isOptional?: boolean) => {
           _id: service._id,
           description: service.description,
           cost: service.cost,
+          originalCost: service.cost,
           type: service.type,
         }
       } else {
@@ -77,6 +80,17 @@ export const useServicesController = (isOptional?: boolean) => {
     )
   }
 
+  const handleApplyDiscount = (discount: number) =>
+    setSelectedServices((prev) =>
+      prev.map((i) => ({
+        ...i,
+        cost:
+          discount < 1 || discount > 100
+            ? i.originalCost
+            : ((100 - discount) * i.originalCost!) / 100,
+      }))
+    )
+
   const areEmptySelectedServices = selectedServices.some((service) =>
     !service._id || !service.cost ? true : false
   )
@@ -90,6 +104,7 @@ export const useServicesController = (isOptional?: boolean) => {
               _id: "",
               description: "",
               cost: 0,
+              originalCost: 0,
               quantity: 1,
               type: "",
             } as ServiceProps,
@@ -105,6 +120,7 @@ export const useServicesController = (isOptional?: boolean) => {
     handleUpdateSelectedServicesOnLocalStorage,
     handleChangeSelectValue,
     handleChangeServiceQuantity,
+    handleApplyDiscount,
     clearAll,
   }
 }

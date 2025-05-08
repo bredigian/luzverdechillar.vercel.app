@@ -5,6 +5,7 @@ import {
   FileDownIcon,
   FilePlus,
   LoaderCircle,
+  Percent,
   Plus,
   Trash,
 } from "lucide-react"
@@ -38,6 +39,7 @@ import Warning from "./warning"
 import { cn } from "@/lib/utils"
 import revalidate from "@/lib/actions"
 import { toast } from "sonner"
+import { useDebouncedCallback } from "use-debounce"
 import { useForm } from "react-hook-form"
 import { useServicesController } from "@/hooks/use-services"
 
@@ -72,6 +74,7 @@ function EstimateForm({ categories }: Props) {
     deleteService,
     handleChangeSelectValue,
     handleChangeServiceQuantity,
+    handleApplyDiscount,
     // handleUpdateSelectedServicesOnLocalStorage,
     clearAll,
   } = useServicesController()
@@ -165,6 +168,10 @@ function EstimateForm({ categories }: Props) {
 
   const [showPDF, setShowPDF] = useState(false)
 
+  const handleDiscount = useDebouncedCallback((value: number) => {
+    handleApplyDiscount(value)
+  }, 200)
+
   return (
     <form
       className="relative flex flex-col gap-4 px-4 pt-2 pb-4 overflow-y-auto md:pb-0 md:px-0"
@@ -219,6 +226,20 @@ function EstimateForm({ categories }: Props) {
         disabled={status === "success"}
       />
       <div className="flex flex-col gap-4">
+        <aside className="flex items-center gap-2 self-end">
+          <Label>Descuento</Label>
+          <div className="relative flex items-center max-w-16">
+            <Percent className="absolute size-4 end-0 mr-3" />
+            <Input
+              defaultValue={0}
+              type="number"
+              min={0}
+              className="text-sm"
+              placeholder="1"
+              onChange={({ target }) => handleDiscount(Number(target.value))}
+            />
+          </div>
+        </aside>
         <aside className="flex items-center justify-between gap-4">
           <Label className="grow">Servicios (electro instalador)</Label>
           {servicesError && <Warning message="Incompleto" />}
@@ -376,6 +397,7 @@ function EstimateForm({ categories }: Props) {
                         description: target.value,
                         type: extraService.type || "Extra",
                         cost: extraService.cost,
+                        originalCost: extraService.originalCost,
                       },
                       index
                     )
@@ -436,22 +458,29 @@ function EstimateForm({ categories }: Props) {
                         description: extraService.description,
                         type: value === "M" ? "Material" : "Extra",
                         cost: extraService.cost,
+                        originalCost: extraService.originalCost,
                       },
                       index
                     )
                   }}
                   defaultValue="E"
                 >
-                  <SelectTrigger className="max-w-16">
+                  <SelectTrigger className="max-w-16 cursor-pointer">
                     <SelectValue placeholder="E" />
                   </SelectTrigger>
                   <SelectContent align="end">
                     <SelectGroup>
                       <SelectLabel>Tipo</SelectLabel>
-                      <SelectItem value="M">
+                      <SelectItem
+                        value="M"
+                        className="hover:bg-accent cursor-pointer"
+                      >
                         <strong>M</strong> (Material)
                       </SelectItem>
-                      <SelectItem value="E">
+                      <SelectItem
+                        value="E"
+                        className="hover:bg-accent cursor-pointer"
+                      >
                         <strong>E</strong> (Extra)
                       </SelectItem>
                     </SelectGroup>

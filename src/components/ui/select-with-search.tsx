@@ -109,13 +109,16 @@ export function SelectWithSearch({
                           {service.description}{" "}
                           <strong>({service.type})</strong>
                         </span>
-                        <span className="ml-auto">
-                          {Intl.NumberFormat("es-AR", {
-                            style: "currency",
-                            currency: "ARS",
-                            minimumFractionDigits: 0,
-                          }).format(service.cost as number)}
-                        </span>
+                        <div className="ml-auto flex flex-col items-end gap-1">
+                          <span className="">
+                            {Intl.NumberFormat("es-AR", {
+                              style: "currency",
+                              currency: "ARS",
+                              minimumFractionDigits: 0,
+                            }).format(service.cost as number)}
+                          </span>
+                          <span className="text-xs opacity-50">(100%)</span>
+                        </div>
                         <Check
                           className={cn(
                             "size-4",

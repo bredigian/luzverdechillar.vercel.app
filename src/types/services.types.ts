@@ -3,5 +3,6 @@ export interface ServiceProps {
   type: string
   description: string
   cost: number | null
+  originalCost: number | null
   quantity?: number
 }
