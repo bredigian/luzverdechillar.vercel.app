@@ -167,7 +167,7 @@ function EstimateForm({ categories }: Props) {
 
   return (
     <form
-      className="relative flex flex-col gap-4 px-4 pt-2 pb-4 max-h-[684px] md:max-h-max overflow-y-auto md:pb-0 md:px-0"
+      className="relative flex flex-col gap-4 px-4 pt-2 pb-4 overflow-y-auto md:pb-0 md:px-0"
       onSubmit={handleSubmit(onSubmit)}
       data-vaul-no-drag
     >
@@ -241,7 +241,7 @@ function EstimateForm({ categories }: Props) {
             Ítem
           </Button>
         </aside>
-        <ul className="flex flex-col gap-4 max-h-[140px] overflow-y-auto">
+        <ul className="flex flex-col gap-4 md:max-h-[140px] overflow-y-auto">
           {selectedServices.map((selectedService, index) => (
             <li
               className="flex items-center flex-row justify-between gap-4"
@@ -351,7 +351,7 @@ function EstimateForm({ categories }: Props) {
             Extra
           </Button>
         </aside>
-        <ul className="flex flex-col gap-4 max-h-[140px] overflow-y-auto">
+        <ul className="flex flex-col gap-4 md:max-h-[140px] overflow-y-auto">
           {extraSelectedServices.length === 0 ? (
             <li className="font-thin text-sm w-full flex items-center gap-2">
               <span className="h-0.5 w-full bg-muted"></span>

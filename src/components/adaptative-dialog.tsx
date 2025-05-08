@@ -11,6 +11,8 @@ import {
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
 } from "./ui/drawer"
@@ -64,15 +66,18 @@ export default function DialogAdaptative({
           customTrigger
         )}
       </DrawerTrigger>
-      <DrawerContent className="!h-auto">
-        <DrawerHeader>
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription hidden={!description ? true : false}>
-            {description}
-          </DrawerDescription>
-        </DrawerHeader>
-        {children}
-      </DrawerContent>
+      <DrawerPortal>
+        <DrawerOverlay className="fixed inset-0"></DrawerOverlay>
+        <DrawerContent className="fixed bottom-0 left-0 right-0 flex flex-col bg-background max-h-[95dvh]">
+          <DrawerHeader>
+            <DrawerTitle>{title}</DrawerTitle>
+            <DrawerDescription hidden={!description ? true : false}>
+              {description}
+            </DrawerDescription>
+          </DrawerHeader>
+          {children}
+        </DrawerContent>
+      </DrawerPortal>
     </Drawer>
   ) : (
     <Dialog open={open} onOpenChange={onOpenChange}>

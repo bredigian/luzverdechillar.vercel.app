@@ -70,7 +70,10 @@ export function SelectWithSearch({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[305px] p-0">
+      <PopoverContent
+        align="start"
+        className="w-[305px] h-[220px] md:h-fit p-0"
+      >
         <Command>
           <CommandInput
             placeholder="Busca un servicio..."
