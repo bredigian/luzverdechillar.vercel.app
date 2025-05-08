@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import EstimateFormDialog from "@/components/estimate-form"
 import Finder from "@/components/finder"
 import { Loader2 } from "lucide-react"
-import Screen from "@/components/layout/screen"
 import { Service } from "@/services/categories.service"
 import { Suspense } from "react"
 
@@ -20,7 +19,7 @@ export default async function EstimatesPage({ searchParams }: Props) {
   const { filter } = await searchParams
 
   return (
-    <Screen className="flex-col gap-4">
+    <section className="flex flex-col gap-4 w-full">
       <h1 className="font-thin">
         Administrá y genera nuevos presupuestos para tus clientes
       </h1>
@@ -43,6 +42,6 @@ export default async function EstimatesPage({ searchParams }: Props) {
       <Suspense fallback={<EstimatesContainerSkeleton />} key={filter}>
         <EstimatesContainer filter={filter} />
       </Suspense>
-    </Screen>
+    </section>
   )
 }

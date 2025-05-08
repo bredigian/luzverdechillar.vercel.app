@@ -1,5 +1,4 @@
 import Schedule from "@/components/schedule"
-import Screen from "@/components/layout/screen"
 import { Service } from "@/services/estimates.service"
 
 export default async function SchedulesPage() {
@@ -7,8 +6,8 @@ export default async function SchedulesPage() {
   if ("error" in estimates) return <p>{estimates.error}</p>
 
   return (
-    <Screen className="flex-col gap-4">
+    <section className="flex flex-col gap-4 w-full">
       <Schedule data={estimates} />
-    </Screen>
+    </section>
   )
 }

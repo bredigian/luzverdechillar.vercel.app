@@ -36,6 +36,7 @@ interface Props {
     | undefined
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  customTrigger?: ReactNode
 }
 
 export default function DialogAdaptative({
@@ -47,16 +48,21 @@ export default function DialogAdaptative({
   variant,
   open,
   onOpenChange,
+  customTrigger,
 }: Props) {
   const isMobile = useIsMobile()
 
   return isMobile ? (
     <Drawer open={open} onOpenChange={onOpenChange} closeThreshold={1}>
       <DrawerTrigger asChild>
-        <Button variant={variant}>
-          {icon && icon}
-          {triggerButtonText}
-        </Button>
+        {!customTrigger ? (
+          <Button variant={variant}>
+            {icon && icon}
+            {triggerButtonText}
+          </Button>
+        ) : (
+          customTrigger
+        )}
       </DrawerTrigger>
       <DrawerContent className="!h-auto">
         <DrawerHeader>
@@ -71,10 +77,14 @@ export default function DialogAdaptative({
   ) : (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button variant={variant}>
-          {icon && icon}
-          {triggerButtonText}
-        </Button>
+        {!customTrigger ? (
+          <Button variant={variant}>
+            {icon && icon}
+            {triggerButtonText}
+          </Button>
+        ) : (
+          customTrigger
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

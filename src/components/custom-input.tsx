@@ -17,7 +17,7 @@ export default function CustomInput({ label, customInput, error, id }: Props) {
       {error && (
         <InputWarning
           message={error}
-          className="absolute top-0 -translate-y-1 self-end"
+          className="absolute top-0 -translate-y-0.5 self-end max-w-52 md:max-w-max truncate"
         />
       )}
     </div>

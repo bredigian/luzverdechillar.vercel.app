@@ -7,23 +7,33 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../ui/breadcrumb"
+import { ReactNode, useEffect } from "react"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../ui/sidebar"
 
 import { AppSidebar } from "../app-sidebar"
 import { ROUTES } from "@/routes"
-import { ReactNode } from "react"
 import { Separator } from "../ui/separator"
+import { UserProps } from "@/types/auth.types"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
+import { useUserStore } from "@/store/user.store"
 
 interface Props {
   children: ReactNode
   className?: string
+  userdata: UserProps
 }
 
-export default function Screen({ children, className }: Props) {
+export default function Screen({ children, className, userdata }: Props) {
   const pathname = usePathname()
   const activePathTitle = ROUTES.find((route) => route.path === pathname)?.title
+
+  const { setUserdata } = useUserStore()
+
+  useEffect(() => {
+    if (userdata) setUserdata(userdata)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <SidebarProvider>

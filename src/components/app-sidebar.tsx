@@ -1,7 +1,7 @@
 "use client"
 
 import { Avatar, AvatarFallback } from "./ui/avatar"
-import { ChevronRight, ChevronsUpDown, LogOut, Moon, Sun } from "lucide-react"
+import { ChevronRight, ChevronsUpDown, Moon, Sun } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,19 +23,22 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-import { Button } from "./ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { ROUTES } from "@/routes"
+import SignoutDialog from "./signout-dialog"
 import logo from "@/assets/logo.webp"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
+import { useUserStore } from "@/store/user.store"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const isActive = (path: string) => pathname === path
   const isMobile = useIsMobile()
+
+  const { userdata } = useUserStore()
 
   const { setTheme } = useTheme()
 
@@ -91,7 +94,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
+            <DropdownMenu key={"dropdown-menu"}>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
@@ -101,9 +104,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <AvatarFallback className="rounded-lg">YM</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">Yaco Mehring</span>
+                    <span className="truncate font-medium">
+                      {userdata?.firstName} {userdata?.lastName}
+                    </span>
                     <span className="truncate text-xs">
-                      yacomehring@gmail.com
+                      {userdata?.username}
                     </span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
@@ -121,9 +126,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <AvatarFallback className="rounded-lg">YM</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">Yaco Mehring</span>
+                      <span className="truncate font-medium">
+                        {userdata?.firstName} {userdata?.lastName}
+                      </span>
                       <span className="truncate text-xs">
-                        yacomehring@gmail.com
+                        {userdata?.username}
                       </span>
                     </div>
                   </div>
@@ -149,10 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <DropdownMenuItem className="cursor-pointer">
-                  <LogOut />
-                  Cerrar sesión
-                </DropdownMenuItem>
+                <SignoutDialog />
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
