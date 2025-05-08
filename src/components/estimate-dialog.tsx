@@ -1,5 +1,6 @@
 "use client"
 
+import { Check, FileDown, Loader2 } from "lucide-react"
 import {
   Dialog,
   DialogClose,
@@ -13,7 +14,6 @@ import {
 
 import { Button } from "./ui/button"
 import { EstimateProps } from "@/types/estimates.types"
-import { FileDown } from "lucide-react"
 import { Service } from "@/services/pdf.service"
 import { format } from "date-fns"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -23,28 +23,37 @@ interface Props {
   data: EstimateProps
 }
 
+type STATE = "pending" | "processing" | "success"
+
 export default function EstimatePDFDialog({ data }: Props) {
   const [pdfURL, setPDFUrl] = useState<string | null>(null)
   const isMobile = useIsMobile()
 
+  const [state, setState] = useState<STATE>("pending")
+
   const personFullname = `${data.person.firstName} ${data.person.lastName}`
 
   const handleDownloadPDF = () => {
-    if (pdfURL) {
-      const createdAtString = format(
-        data.createdAt as Date,
-        "dd/MM/yyyy"
-      ).toString()
+    setState("processing")
 
-      const link = document.createElement("a")
-      link.href = pdfURL
-      link.download = `LUZ_VERDE_CHILLAR_PRESUPUESTO_${createdAtString.replaceAll(
-        "/",
-        "-"
-      )}_${personFullname.toUpperCase().replaceAll(" ", "_")}.pdf`
+    setTimeout(() => {
+      if (pdfURL) {
+        const createdAtString = format(
+          data.createdAt as Date,
+          "dd/MM/yyyy"
+        ).toString()
 
-      link.click()
-    }
+        const link = document.createElement("a")
+        link.href = pdfURL
+        link.download = `LUZ_VERDE_CHILLAR_PRESUPUESTO_${createdAtString.replaceAll(
+          "/",
+          "-"
+        )}_${personFullname.toUpperCase().replaceAll(" ", "_")}.pdf`
+
+        link.click()
+      }
+      setState("success")
+    }, 500)
   }
 
   return (
@@ -81,9 +90,23 @@ export default function EstimatePDFDialog({ data }: Props) {
           <DialogClose asChild>
             <Button variant={"outline"}>Cerrar</Button>
           </DialogClose>
-          <Button type="button" onClick={handleDownloadPDF}>
-            <FileDown />
-            Descargar
+          <Button
+            disabled={state !== "pending"}
+            type="button"
+            onClick={handleDownloadPDF}
+          >
+            {state === "pending" ? (
+              <>
+                <FileDown />
+                Descargar
+              </>
+            ) : state === "processing" ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <>
+                <Check /> Completado
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
