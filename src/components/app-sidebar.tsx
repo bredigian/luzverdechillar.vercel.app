@@ -21,6 +21,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 import Image from "next/image"
@@ -41,6 +42,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { userdata } = useUserStore()
 
   const { setTheme } = useTheme()
+
+  const { isMobile: isSidebarMobile, setOpenMobile } = useSidebar()
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -80,7 +83,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   isActive={isActive(item.path)}
                   asChild
                 >
-                  <Link href={item.path}>
+                  <Link
+                    href={item.path}
+                    onClick={() => {
+                      if (isSidebarMobile) setOpenMobile(false)
+                    }}
+                  >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
