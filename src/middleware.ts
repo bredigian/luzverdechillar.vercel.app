@@ -25,7 +25,10 @@ export default async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard/estimates", req.url))
 
     return NextResponse.next()
-  } catch (error) {}
+  } catch {
+    if (pathname !== "/") return NextResponse.redirect(new URL("/", req.url))
+    return NextResponse.next()
+  }
 }
 
 export const config = {
