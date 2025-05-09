@@ -15,6 +15,7 @@ export const useServicesController = (isOptional?: boolean) => {
             cost: 0,
             originalCost: 0,
             quantity: 1,
+            category: "",
             type: "",
           } as ServiceProps,
         ]
@@ -30,6 +31,7 @@ export const useServicesController = (isOptional?: boolean) => {
         cost: 0,
         originalCost: 0,
         quantity: 1,
+        category: "",
         type: "",
       } as ServiceProps,
     ])
@@ -45,7 +47,8 @@ export const useServicesController = (isOptional?: boolean) => {
           _id: service._id,
           description: service.description,
           cost: service.cost,
-          originalCost: service.cost,
+          originalCost: service.originalCost,
+          category: service.category,
           type: service.type,
         }
       } else {
@@ -106,6 +109,7 @@ export const useServicesController = (isOptional?: boolean) => {
               cost: 0,
               originalCost: 0,
               quantity: 1,
+              category: "",
               type: "",
             } as ServiceProps,
           ]

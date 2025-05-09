@@ -35,7 +35,15 @@ export default async function EstimatesPage({ searchParams }: Props) {
               </Button>
             }
           >
-            <EstimateFormDialog categories={categories} />
+            <EstimateFormDialog
+              categories={categories.map((cat) => ({
+                ...cat,
+                services: cat.services.map((s) => ({
+                  ...s,
+                  category: cat.name,
+                })),
+              }))}
+            />
           </Suspense>
         )}
       </aside>

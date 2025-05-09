@@ -22,6 +22,7 @@ interface Props {
   handleChangeSelectValue: (value: ServiceProps, index: number) => void
   selectedServices: ServiceProps[]
   disabled?: boolean
+  appliedDiscount: number
 }
 
 export function SelectWithSearch({
@@ -31,6 +32,7 @@ export function SelectWithSearch({
   handleChangeSelectValue,
   selectedServices,
   disabled,
+  appliedDiscount,
 }: Props) {
   const [open, setOpen] = useState(false)
 
@@ -64,9 +66,16 @@ export function SelectWithSearch({
           className="min-w-0 w-32 grow justify-between"
           disabled={disabled}
         >
-          <span className="truncate">
-            {value ? text : "Selecciona un servicio..."}
-          </span>
+          <div className="flex flex-col items-start gap-0.5 truncate">
+            {selectedService && (
+              <span className="text-[10px] leading-2 opacity-50 truncate">
+                {selectedService?.category}
+              </span>
+            )}
+            <span className="leading-4 w-max truncate max-w-full">
+              {value ? text : "Selecciona un servicio..."}
+            </span>
+          </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -99,7 +108,16 @@ export function SelectWithSearch({
                         key={service._id}
                         value={`${category.name}${service.description}${service.type}`}
                         onSelect={() => {
-                          handleChangeSelectValue(service, index)
+                          handleChangeSelectValue(
+                            {
+                              ...service,
+                              cost:
+                                ((100 - appliedDiscount) * service.cost!) / 100,
+                              originalCost: service.cost,
+                              category: category.name,
+                            },
+                            index
+                          )
                           setOpen(false)
                         }}
                         className="flex items-center justify-between cursor-pointer"

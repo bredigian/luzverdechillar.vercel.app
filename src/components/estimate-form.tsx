@@ -169,8 +169,11 @@ function EstimateForm({ categories }: Props) {
   const [showPDF, setShowPDF] = useState(false)
 
   const handleDiscount = useDebouncedCallback((value: number) => {
+    setDiscount(value)
     handleApplyDiscount(value)
   }, 200)
+
+  const [discount, setDiscount] = useState(40)
 
   return (
     <form
@@ -231,7 +234,7 @@ function EstimateForm({ categories }: Props) {
           <div className="relative flex items-center max-w-16">
             <Percent className="absolute size-4 end-0 mr-3" />
             <Input
-              defaultValue={0}
+              defaultValue={discount}
               type="number"
               min={0}
               className="text-sm"
@@ -275,6 +278,7 @@ function EstimateForm({ categories }: Props) {
                 index={index}
                 selectedServices={selectedServices}
                 disabled={status === "success"}
+                appliedDiscount={discount}
               />
               <div className="relative flex items-center !w-32">
                 <span
@@ -395,7 +399,8 @@ function EstimateForm({ categories }: Props) {
                       {
                         _id: `extra_${index}`,
                         description: target.value,
-                        type: extraService.type || "Extra",
+                        category: extraService.category || "Extra",
+                        type: "-",
                         cost: extraService.cost,
                         originalCost: extraService.originalCost,
                       },
@@ -456,7 +461,8 @@ function EstimateForm({ categories }: Props) {
                       {
                         _id: `extra_${index}`,
                         description: extraService.description,
-                        type: value === "M" ? "Material" : "Extra",
+                        category: value === "M" ? "Material" : "Extra",
+                        type: "-",
                         cost: extraService.cost,
                         originalCost: extraService.originalCost,
                       },

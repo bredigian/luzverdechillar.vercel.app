@@ -67,7 +67,16 @@ export const Service: Props = {
 
       autoTable(pdf, {
         theme: "grid",
-        head: [["Tipo", "Descripción", "Cantidad", "Precio uni.", "Subtotal"]],
+        head: [
+          [
+            "Categoría",
+            "Tipo",
+            "Descripción",
+            "Cantidad",
+            "Precio uni.",
+            "Subtotal",
+          ],
+        ],
         headStyles: { fillColor: "#f3f3f3", textColor: "#000000" },
         body: data.services
           .sort((a, b) => {
@@ -83,6 +92,7 @@ export const Service: Props = {
             return orderA - orderB
           })
           .map((service) => [
+            service.category,
             service.type.toUpperCase(),
             service.description || "",
             service.quantity || 0,
@@ -97,7 +107,7 @@ export const Service: Props = {
               minimumFractionDigits: 2,
             }).format((service.cost as number) * (service.quantity as number)),
           ]),
-        foot: [["", "", "", "TOTAL", totalCostString]],
+        foot: [["", "", "", "", "TOTAL", totalCostString]],
         footStyles: { fillColor: "#000000" },
         startY: 96,
       })
