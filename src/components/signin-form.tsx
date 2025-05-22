@@ -65,7 +65,7 @@ export default function SigninForm() {
               })}
               id="username"
               className="peer text-sm pl-7 pb-1.5 peer"
-              placeholder="juanperez"
+              placeholder="Usuario"
             />
           </div>
         }
@@ -88,7 +88,7 @@ export default function SigninForm() {
               id="password"
               className="peer text-sm pl-7 pb-1.5"
               type="password"
-              placeholder="•••••••••••••••"
+              placeholder="Contraseña"
             />
           </div>
         }
