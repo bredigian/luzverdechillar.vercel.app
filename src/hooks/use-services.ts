@@ -1,14 +1,18 @@
 import { ServiceProps } from "@/types/services.types"
 import { useState } from "react"
 
-export const useServicesController = (isOptional?: boolean) => {
-  const storedServices = localStorage.getItem("services_temp")
+export const useServicesController = (
+  variableNameForLS: string,
+  isOptional?: boolean
+) => {
+  const storedServices = localStorage.getItem(variableNameForLS)
 
   const [selectedServices, setSelectedServices] = useState<ServiceProps[]>(
-    isOptional
+    storedServices
+      ? JSON.parse(storedServices)
+      : isOptional
       ? []
-      : !storedServices
-      ? [
+      : [
           {
             _id: "",
             description: "",
@@ -19,7 +23,6 @@ export const useServicesController = (isOptional?: boolean) => {
             type: "",
           } as ServiceProps,
         ]
-      : JSON.parse(storedServices)
   )
 
   const addService = () =>
@@ -58,8 +61,11 @@ export const useServicesController = (isOptional?: boolean) => {
     setSelectedServices(updatedServices)
   }
 
-  const handleUpdateSelectedServicesOnLocalStorage = () =>
-    localStorage.setItem("services_temp", JSON.stringify(selectedServices))
+  const handleUpdateSelectedServicesOnLocalStorage = (
+    variableName: "services_temp" | "extra_services_temp"
+  ) => {
+    localStorage.setItem(variableName, JSON.stringify(selectedServices))
+  }
 
   const handleChangeServiceCost = (value: number, id: string) => {
     setSelectedServices((prev) =>

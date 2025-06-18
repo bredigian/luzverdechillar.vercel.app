@@ -9,6 +9,7 @@ import {
   Plus,
   Trash,
 } from "lucide-react"
+import { EstimateProps, PersonProps } from "@/types/estimates.types"
 import {
   Select,
   SelectContent,
@@ -29,7 +30,6 @@ import { DateRange } from "react-day-picker"
 import { DateRangePicker } from "./ui/date-picker"
 import DialogAdaptative from "./adaptative-dialog"
 import { ErrorResponseProps } from "@/types/responses.types"
-import { EstimateProps } from "@/types/estimates.types"
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Service as PDFService } from "@/services/pdf.service"
@@ -49,16 +49,43 @@ interface Props {
 
 type FORM_STATUS = "pending" | "processing" | "success"
 
+interface AuxiliarEstimateProps extends EstimateProps, PersonProps {
+  discount: number
+}
+
 function EstimateForm({ categories }: Props) {
   const [status, setStatus] = useState<FORM_STATUS>("pending")
+
+  const temporalStoredEstimate = JSON.parse(
+    localStorage.getItem("temp_estimate") || "{}"
+  ) as AuxiliarEstimateProps
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<EstimateProps>()
+  } = useForm<EstimateProps>({
+    defaultValues: {
+      person: {
+        firstName:
+          temporalStoredEstimate?.person?.firstName ??
+          temporalStoredEstimate.firstName,
+        lastName:
+          temporalStoredEstimate?.person?.lastName ??
+          temporalStoredEstimate.lastName,
+      },
+    },
+  })
 
-  const [dateRange, setDateRange] = useState<DateRange>()
+  const isDateRangeStored =
+    temporalStoredEstimate?.from && temporalStoredEstimate?.to
+
+  const [dateRange, setDateRange] = useState<DateRange | null>(
+    isDateRangeStored && {
+      from: new Date(temporalStoredEstimate.from),
+      to: new Date(temporalStoredEstimate.to),
+    }
+  )
   const [dateRangeError, setDateRangeError] = useState(false)
 
   const [servicesError, setServicesError] = useState(false)
@@ -75,9 +102,9 @@ function EstimateForm({ categories }: Props) {
     handleChangeSelectValue,
     handleChangeServiceQuantity,
     handleApplyDiscount,
-    // handleUpdateSelectedServicesOnLocalStorage,
+    handleUpdateSelectedServicesOnLocalStorage,
     clearAll,
-  } = useServicesController()
+  } = useServicesController("services_temp")
 
   const {
     selectedServices: extraSelectedServices,
@@ -87,29 +114,45 @@ function EstimateForm({ categories }: Props) {
     deleteService: extraDeleteService,
     handleChangeSelectValue: extraHandleChangeSelectValue,
     handleChangeServiceQuantity: extraHandleChangeServiceQuantity,
-    // handleUpdateSelectedServicesOnLocalStorage:
-    //   extraHandleUpdateSelectedServicesOnLocalStorage,
+    handleUpdateSelectedServicesOnLocalStorage:
+      extraHandleUpdateSelectedServicesOnLocalStorage,
     clearAll: extraClearAll,
-  } = useServicesController(true)
+  } = useServicesController("extra_services_temp", true)
+
+  useEffect(() => {
+    handleUpdateSelectedServicesOnLocalStorage("services_temp")
+  }, [selectedServices])
+
+  useEffect(() => {
+    extraHandleUpdateSelectedServicesOnLocalStorage("extra_services_temp")
+  }, [extraSelectedServices])
 
   const [createdEstimate, setCreatedEstimated] = useState<EstimateProps>()
+
+  const resetForm = () => {
+    localStorage.removeItem("temp_estimate")
+    localStorage.removeItem("services_temp")
+    localStorage.removeItem("extra_services_temp")
+  }
 
   const onSubmit = async (formData: EstimateProps) => {
     if (!dateRange?.from || !dateRange?.to) {
       setDateRangeError(true)
       return
     }
-    if (areEmptySelectedServices) {
-      setServicesError(true)
-      if (extraAreEmptySelectedServices) {
-        setExtraServicesError(true)
-      }
+
+    if (extraAreEmptySelectedServices) {
+      setExtraServicesError(true)
 
       return
     }
 
-    if (extraAreEmptySelectedServices) {
-      setExtraServicesError(true)
+    if (
+      selectedServices.filter((i) => i._id).length === 0 &&
+      extraSelectedServices.length === 0
+    ) {
+      toast.error("Debes seleccionar al menos un servicio.")
+
       return
     }
 
@@ -118,7 +161,9 @@ function EstimateForm({ categories }: Props) {
       from: dateRange.from,
       to: dateRange.to,
       services: [
-        ...selectedServices.map((item) => ({ ...item, _id: undefined })),
+        ...selectedServices
+          .filter((item) => item._id)
+          .map((item) => ({ ...item, _id: undefined })),
         ...extraSelectedServices.map((item) => ({ ...item, _id: undefined })),
       ],
       totalCost,
@@ -134,6 +179,8 @@ function EstimateForm({ categories }: Props) {
 
       toast.success("Prespuesto creado con éxito", { position: "top-center" })
       setStatus("success")
+
+      resetForm()
     } catch (e) {
       setStatus("pending")
 
@@ -166,14 +213,47 @@ function EstimateForm({ categories }: Props) {
       setDateRangeError(false)
   }, [dateRange])
 
+  const handleLocalStorage = (
+    key: keyof EstimateProps | keyof PersonProps | keyof { discount: number },
+    value: EstimateProps[keyof EstimateProps]
+  ) => {
+    const temporalEstimate = localStorage.getItem("temp_estimate")
+    if (!temporalEstimate)
+      localStorage.setItem(
+        "temp_estimate",
+        JSON.stringify({
+          [key]: value,
+        } as Partial<EstimateProps>)
+      )
+    else {
+      const estimate: EstimateProps = JSON.parse(temporalEstimate)
+
+      let updated: EstimateProps = {
+        ...estimate,
+        [key]: value,
+      }
+
+      localStorage.setItem("temp_estimate", JSON.stringify(updated))
+    }
+  }
+
+  const handleStrings = useDebouncedCallback(
+    (key: keyof EstimateProps | keyof PersonProps, value: string) =>
+      handleLocalStorage(key, value),
+    300
+  )
+
   const [showPDF, setShowPDF] = useState(false)
 
   const handleDiscount = useDebouncedCallback((value: number) => {
     setDiscount(value)
     handleApplyDiscount(value)
+    handleLocalStorage("discount", value)
   }, 200)
 
-  const [discount, setDiscount] = useState(40)
+  const [discount, setDiscount] = useState(
+    +temporalStoredEstimate?.discount || 40
+  )
 
   return (
     <form
@@ -195,6 +275,9 @@ function EstimateForm({ categories }: Props) {
               type="text"
               placeholder="Ej: Juan"
               disabled={status === "success"}
+              onChange={({ target }) =>
+                handleStrings("firstName", target.value.trim())
+              }
             />
           }
           error={errors?.person?.firstName?.message}
@@ -212,18 +295,25 @@ function EstimateForm({ categories }: Props) {
               type="text"
               placeholder="Ej: Pérez"
               disabled={status === "success"}
+              onChange={({ target }) =>
+                handleStrings("lastName", target.value.trim())
+              }
             />
           }
           error={errors?.person?.lastName?.message}
         />
       </div>
       <div className="relative flex w-full items-center justify-between gap-4">
-        <Label>Fecha</Label>
+        <Label htmlFor="date-range">Fecha</Label>
         {dateRangeError && <Warning message="Seleccioná un rango de fechas" />}
       </div>
       <DateRangePicker
-        date={dateRange}
-        setDate={setDateRange}
+        date={dateRange!}
+        setDate={(selectedRange) => {
+          setDateRange(selectedRange!)
+          handleLocalStorage("from", selectedRange?.from)
+          handleLocalStorage("to", selectedRange?.to)
+        }}
         placeholder="Seleccioná el rango de fechas estimativo"
         align="start"
         disabled={status === "success"}
@@ -293,7 +383,7 @@ function EstimateForm({ categories }: Props) {
                 </span>
                 <CurrencyInput
                   disabled={!selectedService._id || status === "success"}
-                  defaultValue={selectedService.cost ?? 0}
+                  defaultValue={selectedService?.cost || 0}
                   decimalsLimit={2}
                   allowDecimals={false}
                   className={cn(
@@ -317,7 +407,7 @@ function EstimateForm({ categories }: Props) {
                 type="number"
                 min={1}
                 className="text-center text-sm max-w-10 px-1"
-                placeholder="1"
+                placeholder={selectedService.quantity?.toString() ?? "1"}
                 onChange={({ target }) =>
                   handleChangeServiceQuantity(
                     Number(target.value) < 1 ? 1 : Number(target.value),
@@ -422,7 +512,7 @@ function EstimateForm({ categories }: Props) {
                   </span>
                   <CurrencyInput
                     disabled={!extraService._id || status === "success"}
-                    defaultValue={extraService.cost ?? 0}
+                    defaultValue={extraService?.cost || 0}
                     decimalsLimit={2}
                     allowDecimals={false}
                     className={cn(
@@ -446,7 +536,7 @@ function EstimateForm({ categories }: Props) {
                   type="number"
                   min={1}
                   className="text-center text-sm max-w-10"
-                  placeholder="1"
+                  placeholder={extraService.quantity?.toString() ?? "1"}
                   onChange={({ target }) =>
                     extraHandleChangeServiceQuantity(
                       Number(target.value) < 1 ? 1 : Number(target.value),
@@ -469,7 +559,7 @@ function EstimateForm({ categories }: Props) {
                       index
                     )
                   }}
-                  defaultValue="E"
+                  defaultValue={extraService.category.charAt(0) || "E"}
                 >
                   <SelectTrigger className="max-w-16 cursor-pointer">
                     <SelectValue placeholder="E" />
@@ -506,35 +596,50 @@ function EstimateForm({ categories }: Props) {
           )}
         </ul>
       </div>
-      <Button
-        type={status === "success" ? "button" : "submit"}
-        onClick={() => {
-          if (status === "success")
-            if (createdEstimate)
-              PDFService.generatePDF(createdEstimate as EstimateProps)
-        }}
-        disabled={status === "processing"}
-        className="font-bold sticky bottom-0 w-full"
-      >
-        {status === "pending" ? (
-          <>
-            Crear prespuesto
-            <strong>
-              {Intl.NumberFormat("es-AR", {
-                style: "currency",
-                currency: "ARS",
-                minimumFractionDigits: 2,
-              }).format(totalCost)}
-            </strong>
-          </>
-        ) : status === "processing" ? (
-          <LoaderCircle className="animate-spin" />
-        ) : (
-          <>
-            Exportar como PDF <FileDownIcon />
-          </>
-        )}
-      </Button>
+      <div className="grid place-items-center gap-4 grid-cols-6">
+        <Button
+          type="reset"
+          variant={"secondary"}
+          onClick={() => {
+            resetForm()
+            clearAll()
+            extraClearAll()
+            setDateRange(null)
+          }}
+          className="col-span-2 w-full"
+        >
+          <BrushCleaning /> Limpiar
+        </Button>
+        <Button
+          type={status === "success" ? "button" : "submit"}
+          onClick={() => {
+            if (status === "success")
+              if (createdEstimate)
+                PDFService.generatePDF(createdEstimate as EstimateProps)
+          }}
+          disabled={status === "processing"}
+          className="font-bold sticky bottom-0 w-full col-span-4"
+        >
+          {status === "pending" ? (
+            <>
+              Crear
+              <strong>
+                {Intl.NumberFormat("es-AR", {
+                  style: "currency",
+                  currency: "ARS",
+                  minimumFractionDigits: 2,
+                }).format(totalCost)}
+              </strong>
+            </>
+          ) : status === "processing" ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <>
+              Exportar como PDF <FileDownIcon />
+            </>
+          )}
+        </Button>
+      </div>
     </form>
   )
 }

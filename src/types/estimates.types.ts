@@ -1,6 +1,6 @@
 import { ServiceProps } from "./services.types"
 
-interface PersonProps {
+export interface PersonProps {
   firstName: string
   lastName: string
 }

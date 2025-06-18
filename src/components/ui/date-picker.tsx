@@ -35,6 +35,7 @@ export function DateRangePicker({
           )}
           disabled={disabled}
           type="button"
+          id="date-range"
         >
           <CalendarIcon />
           {date?.from && date?.to ? (
@@ -43,7 +44,9 @@ export function DateRangePicker({
               "dd/MM/yyyy"
             )}`
           ) : (
-            <span>{placeholder ?? "Selecciona una fecha"}</span>
+            <p className="select-none">
+              {placeholder ?? "Selecciona una fecha"}
+            </p>
           )}
         </Button>
       </PopoverTrigger>
