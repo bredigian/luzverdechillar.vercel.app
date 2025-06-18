@@ -228,7 +228,7 @@ function EstimateForm({ categories }: Props) {
     else {
       const estimate: EstimateProps = JSON.parse(temporalEstimate)
 
-      let updated: EstimateProps = {
+      const updated: EstimateProps = {
         ...estimate,
         [key]: value,
       }
