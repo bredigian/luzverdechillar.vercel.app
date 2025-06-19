@@ -3,7 +3,7 @@ import { Label } from "./ui/label"
 import { ReactNode } from "react"
 
 interface Props {
-  label: string
+  label?: string
   customInput: ReactNode
   error?: string
   id: string
@@ -12,12 +12,12 @@ interface Props {
 export default function CustomInput({ label, customInput, error, id }: Props) {
   return (
     <div className="relative flex flex-col gap-4">
-      <Label htmlFor={id}>{label}</Label>
+      {label && <Label htmlFor={id}>{label}</Label>}
       {customInput}
       {error && (
         <InputWarning
           message={error}
-          className="absolute top-0 -translate-y-0.5 self-end max-w-52 md:max-w-max truncate"
+          className="self-end max-w-52 md:max-w-max truncate"
         />
       )}
     </div>

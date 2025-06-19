@@ -1,12 +1,21 @@
 "use client"
 
-import { Check, KeyRoundIcon, Loader2, LogIn, User } from "lucide-react"
+import {
+  Check,
+  Eye,
+  EyeClosed,
+  KeyRoundIcon,
+  Loader2,
+  LogIn,
+  User,
+} from "lucide-react"
 
 import { Button } from "./ui/button"
 import Cookie from "js-cookie"
 import CustomInput from "./custom-input"
 import { ErrorResponseProps } from "@/types/responses.types"
 import { Input } from "./ui/input"
+import { Label } from "./ui/label"
 import { Service } from "@/services/auth.service"
 import { SigninFormProps } from "@/types/auth.types"
 import { toast } from "sonner"
@@ -24,6 +33,11 @@ export default function SigninForm() {
   } = useForm<SigninFormProps>()
 
   const [state, setState] = useState<STATE>("pending")
+
+  const [passInput, setPassInput] = useState<"text" | "password">("password")
+
+  const handlePassInput = () =>
+    setPassInput((prev) => (prev === "password" ? "text" : "password"))
 
   const { push } = useRouter()
 
@@ -50,11 +64,9 @@ export default function SigninForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <CustomInput
         id="username"
-        label="Usuario"
         error={errors?.username?.message}
         customInput={
           <div className="relative group flex items-center">
-            <User className="absolute size-4 ml-2 opacity-60 group-focus-within:opacity-100 peer-[:not(:placeholder-shown)]:opacity-100" />
             <Input
               {...register("username", {
                 required: "El usuario es requerido",
@@ -67,16 +79,15 @@ export default function SigninForm() {
               className="peer text-sm pl-7 pb-1.5 peer"
               placeholder="Usuario"
             />
+            <User className="absolute size-4 ml-2 opacity-60 group-focus-within:opacity-100 peer-[:not(:placeholder-shown)]:opacity-100" />
           </div>
         }
       />
       <CustomInput
         id="password"
-        label="Contraseña"
         error={errors?.password?.message}
         customInput={
           <div className="relative group flex items-center">
-            <KeyRoundIcon className="absolute size-4 ml-2 opacity-60 group-focus-within:opacity-100 peer-[:not(:placeholder-shown)]:opacity-100" />
             <Input
               {...register("password", {
                 required: "La contraseña es requerida",
@@ -87,9 +98,19 @@ export default function SigninForm() {
               })}
               id="password"
               className="peer text-sm pl-7 pb-1.5"
-              type="password"
+              type={passInput}
               placeholder="Contraseña"
             />
+            <KeyRoundIcon className="absolute size-4 ml-2 opacity-60 group-focus-within:opacity-100 peer-[:not(:placeholder-shown)]:opacity-100" />
+            <Button
+              type="button"
+              onClick={handlePassInput}
+              size={"icon"}
+              variant={"ghost"}
+              className="absolute end-0 opacity-60 group-focus-within:opacity-100 peer-[:not(:placeholder-shown)]:opacity-100"
+            >
+              {passInput === "password" ? <EyeClosed /> : <Eye />}
+            </Button>
           </div>
         }
       />
@@ -97,7 +118,7 @@ export default function SigninForm() {
         type="submit"
         disabled={state === "processing" || state === "success"}
         data-success={state === "success" ? true : false}
-        className="data-[success]:opacity-100"
+        className="data-[success]:opacity-100 mt-2"
       >
         {state === "pending" ? (
           <>
