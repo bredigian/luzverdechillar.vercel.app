@@ -3,6 +3,7 @@ import EstimatesContainer, {
 } from "@/components/estimates-container"
 
 import { Button } from "@/components/ui/button"
+import { CategoryProps } from "@/types/categories.types"
 import EstimateFormDialog from "@/components/estimate-form"
 import Finder from "@/components/finder"
 import { Loader2 } from "lucide-react"
@@ -48,7 +49,10 @@ export default async function EstimatesPage({ searchParams }: Props) {
         )}
       </aside>
       <Suspense fallback={<EstimatesContainerSkeleton />} key={filter}>
-        <EstimatesContainer filter={filter} />
+        <EstimatesContainer
+          filter={filter}
+          categories={categories as CategoryProps[]}
+        />
       </Suspense>
     </section>
   )

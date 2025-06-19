@@ -1,12 +1,17 @@
 import EstimateItem, { EstimateItemSkeleton } from "./estimate-item"
 
+import { CategoryProps } from "@/types/categories.types"
 import { Service } from "@/services/estimates.service"
 
 interface Props {
   filter?: string
+  categories: CategoryProps[]
 }
 
-export default async function EstimatesContainer({ filter }: Props) {
+export default async function EstimatesContainer({
+  filter,
+  categories,
+}: Props) {
   const estimates = await Service.getEstimates()
   if ("error" in estimates) return <p>{estimates?.error}</p>
 
@@ -36,7 +41,11 @@ export default async function EstimatesContainer({ filter }: Props) {
         </li>
       ) : (
         filteredData.map((estimate) => (
-          <EstimateItem key={estimate._id} data={estimate} />
+          <EstimateItem
+            key={estimate._id}
+            data={estimate}
+            categories={categories}
+          />
         ))
       )}
     </ul>

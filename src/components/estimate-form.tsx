@@ -45,6 +45,7 @@ import { useServicesController } from "@/hooks/use-services"
 
 interface Props {
   categories: CategoryProps[]
+  defaultData?: EstimateProps
 }
 
 type FORM_STATUS = "pending" | "processing" | "success"
@@ -53,7 +54,7 @@ interface AuxiliarEstimateProps extends EstimateProps, PersonProps {
   discount: number
 }
 
-function EstimateForm({ categories }: Props) {
+export function EstimateForm({ categories, defaultData }: Props) {
   const [status, setStatus] = useState<FORM_STATUS>("pending")
 
   const temporalStoredEstimate = JSON.parse(
@@ -65,26 +66,30 @@ function EstimateForm({ categories }: Props) {
     handleSubmit,
     formState: { errors },
   } = useForm<EstimateProps>({
-    defaultValues: {
-      person: {
-        firstName:
-          temporalStoredEstimate?.person?.firstName ??
-          temporalStoredEstimate.firstName,
-        lastName:
-          temporalStoredEstimate?.person?.lastName ??
-          temporalStoredEstimate.lastName,
-      },
-    },
+    defaultValues: defaultData
+      ? { person: defaultData.person }
+      : {
+          person: {
+            firstName:
+              temporalStoredEstimate?.person?.firstName ??
+              temporalStoredEstimate.firstName,
+            lastName:
+              temporalStoredEstimate?.person?.lastName ??
+              temporalStoredEstimate.lastName,
+          },
+        },
   })
 
   const isDateRangeStored =
     temporalStoredEstimate?.from && temporalStoredEstimate?.to
 
   const [dateRange, setDateRange] = useState<DateRange | null>(
-    isDateRangeStored && {
-      from: new Date(temporalStoredEstimate.from),
-      to: new Date(temporalStoredEstimate.to),
-    }
+    defaultData
+      ? { from: new Date(defaultData.from), to: new Date(defaultData.to) }
+      : isDateRangeStored && {
+          from: new Date(temporalStoredEstimate.from),
+          to: new Date(temporalStoredEstimate.to),
+        }
   )
   const [dateRangeError, setDateRangeError] = useState(false)
 
@@ -92,6 +97,17 @@ function EstimateForm({ categories }: Props) {
   const [extraServicesError, setExtraServicesError] = useState(false)
 
   const [totalCost, setTotalCost] = useState(0)
+
+  const defaultSelectedServices = defaultData?.services.filter(
+    (s) =>
+      s.category.toLowerCase() !== "extra" ||
+      s.category.toLowerCase() === "material"
+  )
+  const defaultExtraSelectedServices = defaultData?.services.filter(
+    (s) =>
+      s.category.toLowerCase() === "extra" ||
+      s.category.toLowerCase() === "material"
+  )
 
   const {
     selectedServices,
@@ -104,7 +120,7 @@ function EstimateForm({ categories }: Props) {
     handleApplyDiscount,
     handleUpdateSelectedServicesOnLocalStorage,
     clearAll,
-  } = useServicesController("services_temp")
+  } = useServicesController("services_temp", defaultSelectedServices)
 
   const {
     selectedServices: extraSelectedServices,
@@ -117,14 +133,20 @@ function EstimateForm({ categories }: Props) {
     handleUpdateSelectedServicesOnLocalStorage:
       extraHandleUpdateSelectedServicesOnLocalStorage,
     clearAll: extraClearAll,
-  } = useServicesController("extra_services_temp", true)
+  } = useServicesController(
+    "extra_services_temp",
+    defaultExtraSelectedServices,
+    true
+  )
 
   useEffect(() => {
-    handleUpdateSelectedServicesOnLocalStorage("services_temp")
+    if (!defaultData)
+      handleUpdateSelectedServicesOnLocalStorage("services_temp")
   }, [selectedServices])
 
   useEffect(() => {
-    extraHandleUpdateSelectedServicesOnLocalStorage("extra_services_temp")
+    if (!defaultData)
+      extraHandleUpdateSelectedServicesOnLocalStorage("extra_services_temp")
   }, [extraSelectedServices])
 
   const [createdEstimate, setCreatedEstimated] = useState<EstimateProps>()
@@ -172,12 +194,18 @@ function EstimateForm({ categories }: Props) {
     try {
       setStatus("processing")
 
-      const created = await Service.generateEstimate(PAYLOAD)
-      setCreatedEstimated(created)
+      const lastEstimate = !defaultData
+        ? await Service.generateEstimate(PAYLOAD)
+        : await Service.updateEstimate(defaultData?._id as string, PAYLOAD)
+
+      setCreatedEstimated(lastEstimate)
 
       await revalidate("estimates")
 
-      toast.success("Prespuesto creado con éxito", { position: "top-center" })
+      toast.success(
+        `Prespuesto ${!defaultData ? "creado" : "actualizado"} con éxito`,
+        { position: "top-center" }
+      )
       setStatus("success")
 
       resetForm()
@@ -363,7 +391,7 @@ function EstimateForm({ categories }: Props) {
             >
               <SelectWithSearch
                 data={categories}
-                value={`${selectedService._id}_${selectedService.description}_${selectedService.type}`}
+                value={`${selectedService.id}_${selectedService.description}_${selectedService.type}`}
                 handleChangeSelectValue={handleChangeSelectValue}
                 index={index}
                 selectedServices={selectedServices}
@@ -382,7 +410,7 @@ function EstimateForm({ categories }: Props) {
                   $
                 </span>
                 <CurrencyInput
-                  disabled={!selectedService._id || status === "success"}
+                  disabled={!selectedService.id || status === "success"}
                   defaultValue={selectedService?.cost || 0}
                   decimalsLimit={2}
                   allowDecimals={false}
@@ -396,7 +424,7 @@ function EstimateForm({ categories }: Props) {
                   onValueChange={(_, __, values) =>
                     handleChangeServiceCost(
                       Number(values?.float),
-                      selectedService._id as string
+                      selectedService.id as string
                     )
                   }
                   decimalSeparator=","
@@ -411,10 +439,10 @@ function EstimateForm({ categories }: Props) {
                 onChange={({ target }) =>
                   handleChangeServiceQuantity(
                     Number(target.value) < 1 ? 1 : Number(target.value),
-                    selectedService._id as string
+                    selectedService.id as string
                   )
                 }
-                disabled={!selectedService._id || status === "success"}
+                disabled={!selectedService.id || status === "success"}
               />
               <Button
                 size={"icon"}
@@ -488,6 +516,7 @@ function EstimateForm({ categories }: Props) {
                     extraHandleChangeSelectValue(
                       {
                         _id: `extra_${index}`,
+                        id: `extra_${index}`,
                         description: target.value,
                         category: extraService.category || "Extra",
                         type: "-",
@@ -503,7 +532,7 @@ function EstimateForm({ categories }: Props) {
                   <span
                     className={cn(
                       "absolute pl-3 pt-0.5",
-                      !extraService._id || status === "success"
+                      !extraService.id || status === "success"
                         ? "opacity-50"
                         : "opacity-100"
                     )}
@@ -511,7 +540,7 @@ function EstimateForm({ categories }: Props) {
                     $
                   </span>
                   <CurrencyInput
-                    disabled={!extraService._id || status === "success"}
+                    disabled={!extraService.id || status === "success"}
                     defaultValue={extraService?.cost || 0}
                     decimalsLimit={2}
                     allowDecimals={false}
@@ -525,7 +554,7 @@ function EstimateForm({ categories }: Props) {
                     onValueChange={(value, name, values) => {
                       extraHandleChangeServiceCost(
                         Number(values?.float),
-                        extraService._id as string
+                        extraService.id as string
                       )
                     }}
                     decimalSeparator=","
@@ -540,7 +569,7 @@ function EstimateForm({ categories }: Props) {
                   onChange={({ target }) =>
                     extraHandleChangeServiceQuantity(
                       Number(target.value) < 1 ? 1 : Number(target.value),
-                      extraService._id as string
+                      extraService.id as string
                     )
                   }
                   disabled={!extraService.description || status === "success"}
@@ -550,6 +579,7 @@ function EstimateForm({ categories }: Props) {
                     extraHandleChangeSelectValue(
                       {
                         _id: `extra_${index}`,
+                        id: `extra_${index}`,
                         description: extraService.description,
                         category: value === "M" ? "Material" : "Extra",
                         type: "-",
@@ -622,7 +652,7 @@ function EstimateForm({ categories }: Props) {
         >
           {status === "pending" ? (
             <>
-              Crear
+              {!defaultData ? "Crear" : "Modificar"}
               <strong>
                 {Intl.NumberFormat("es-AR", {
                   style: "currency",

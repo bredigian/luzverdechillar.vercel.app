@@ -96,7 +96,7 @@ export function SelectWithSearch({
                   {category.services.map((service) => {
                     const isDisabled = selectedServices.find(
                       (s) =>
-                        s._id === service._id &&
+                        s.id === service._id &&
                         s.type === service.type &&
                         s.description === service.description
                     )

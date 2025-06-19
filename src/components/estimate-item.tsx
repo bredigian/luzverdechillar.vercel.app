@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
+import { CategoryProps } from "@/types/categories.types"
 import DialogAdaptative from "./adaptative-dialog"
 import { ErrorResponseProps } from "@/types/responses.types"
 import EstimatePDFDialog from "./estimate-dialog"
@@ -86,9 +87,10 @@ function DeleteEstimate({ _id }: { _id: EstimateProps["_id"] }) {
 
 interface Props {
   data: EstimateProps
+  categories: CategoryProps[]
 }
 
-export default function EstimateItem({ data }: Props) {
+export default function EstimateItem({ data, categories }: Props) {
   const personFullname = `${data.person.firstName} ${data.person.lastName}`
   const dateFromString = format(data.from, "dd/MM/yyyy").toString()
   const dateToString = format(data.to, "dd/MM/yyyy").toString()
@@ -101,6 +103,11 @@ export default function EstimateItem({ data }: Props) {
   const createdAtString = format(
     data.createdAt as Date,
     "dd/MM/yyyy"
+  ).toString()
+
+  const updatedAtString = format(
+    data.updatedAt as Date,
+    "dd/MM/yyyy - HH:mm"
   ).toString()
 
   return (
@@ -122,7 +129,10 @@ export default function EstimateItem({ data }: Props) {
               >
                 <span className="text-sm font-semibold">Opciones</span>
                 <div className="flex flex-col gap-2">
-                  <EstimateUpdateFormDialog data={data} />
+                  <EstimateUpdateFormDialog
+                    data={data}
+                    categories={categories}
+                  />
                   <EstimatePDFDialog data={data} />
                   <DeleteEstimate _id={data._id} />
                 </div>
@@ -139,6 +149,9 @@ export default function EstimateItem({ data }: Props) {
           </Badge>
           <Badge variant={"outline"} className="font-extralight opacity-50">
             Creado el {createdAtString}
+          </Badge>
+          <Badge variant={"outline"} className="font-extralight opacity-50">
+            Modificado el {updatedAtString}
           </Badge>
         </CardContent>
         <CardFooter hidden>

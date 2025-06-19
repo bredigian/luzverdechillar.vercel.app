@@ -1,4 +1,3 @@
-import { DateRange } from "react-day-picker"
 import { ErrorResponseProps } from "@/types/responses.types"
 import { EstimateProps } from "@/types/estimates.types"
 
@@ -38,7 +37,7 @@ export const Service = {
 
     return data as EstimateProps[]
   },
-  updateDates: async (_id: string, payload: DateRange) => {
+  updateEstimate: async (_id: string, payload: EstimateProps) => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL
     const PATH = `/v1/estimates?_id=${_id}`
     const URL = `${API_URL}${PATH}`

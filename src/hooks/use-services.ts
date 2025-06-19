@@ -3,18 +3,22 @@ import { useState } from "react"
 
 export const useServicesController = (
   variableNameForLS: string,
+  defaultSelectedServices?: ServiceProps[],
   isOptional?: boolean
 ) => {
   const storedServices = localStorage.getItem(variableNameForLS)
 
   const [selectedServices, setSelectedServices] = useState<ServiceProps[]>(
-    storedServices
+    defaultSelectedServices
+      ? defaultSelectedServices
+      : storedServices
       ? JSON.parse(storedServices)
       : isOptional
       ? []
       : [
           {
             _id: "",
+            id: "",
             description: "",
             cost: 0,
             originalCost: 0,
@@ -30,6 +34,7 @@ export const useServicesController = (
       ...prev,
       {
         _id: "",
+        id: "",
         description: "",
         cost: 0,
         originalCost: 0,
@@ -48,6 +53,7 @@ export const useServicesController = (
         return {
           ...item,
           _id: service._id,
+          id: service._id,
           description: service.description,
           cost: service.cost,
           originalCost: service.originalCost,
@@ -72,7 +78,7 @@ export const useServicesController = (
       prev.map((item) => {
         return {
           ...item,
-          cost: item._id === id ? value : item.cost,
+          cost: item.id === id ? value : item.cost,
         }
       })
     )
@@ -83,7 +89,7 @@ export const useServicesController = (
       prev.map((item) => {
         return {
           ...item,
-          quantity: item._id === id ? value : item.quantity,
+          quantity: item.id === id ? value : item.quantity,
         }
       })
     )
@@ -101,7 +107,7 @@ export const useServicesController = (
     )
 
   const areEmptySelectedServices = selectedServices.some((service) =>
-    !service._id || !service.cost ? true : false
+    !service.id || !service.cost ? true : false
   )
 
   const clearAll = () =>
@@ -110,7 +116,7 @@ export const useServicesController = (
         ? []
         : [
             {
-              _id: "",
+              id: "",
               description: "",
               cost: 0,
               originalCost: 0,
