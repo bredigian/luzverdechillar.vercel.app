@@ -100,8 +100,8 @@ export function EstimateForm({ categories, defaultData }: Props) {
 
   const defaultSelectedServices = defaultData?.services.filter(
     (s) =>
-      s.category.toLowerCase() !== "extra" ||
-      s.category.toLowerCase() === "material"
+      s.category.toLowerCase() !== "extra" &&
+      s.category.toLowerCase() !== "material"
   )
   const defaultExtraSelectedServices = defaultData?.services.filter(
     (s) =>
