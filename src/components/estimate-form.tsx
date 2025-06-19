@@ -350,7 +350,12 @@ export function EstimateForm({ categories, defaultData }: Props) {
         <aside className="flex items-center gap-2 self-end">
           <Label>Descuento sobre Electro Instalador</Label>
           <div className="relative flex items-center max-w-16">
-            <Percent className="absolute size-4 end-0 mr-3" />
+            <Percent
+              className={cn(
+                "absolute size-4 end-0 mr-3",
+                status === "success" ? "opacity-50" : "opacity-100"
+              )}
+            />
             <Input
               defaultValue={discount}
               type="number"
@@ -358,6 +363,7 @@ export function EstimateForm({ categories, defaultData }: Props) {
               className="text-sm"
               placeholder="1"
               onChange={({ target }) => handleDiscount(Number(target.value))}
+              disabled={status === "success"}
             />
           </div>
         </aside>
@@ -601,6 +607,7 @@ export function EstimateForm({ categories, defaultData }: Props) {
                       )
                     }}
                     defaultValue={extraService.category || "Material"}
+                    disabled={status === "success"}
                   >
                     <SelectTrigger className="grow cursor-pointer">
                       <SelectValue placeholder="Material" />
