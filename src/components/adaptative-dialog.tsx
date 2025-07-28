@@ -68,7 +68,10 @@ export default function DialogAdaptative({
       </DrawerTrigger>
       <DrawerPortal>
         <DrawerOverlay className="fixed inset-0"></DrawerOverlay>
-        <DrawerContent className="fixed bottom-0 left-0 right-0 flex flex-col bg-background max-h-[95dvh]">
+        <DrawerContent
+          id="drawer"
+          className="fixed bottom-0 left-0 right-0 flex flex-col bg-background max-h-[95dvh]"
+        >
           <DrawerHeader>
             <DrawerTitle>{title}</DrawerTitle>
             <DrawerDescription hidden={!description ? true : false}>
