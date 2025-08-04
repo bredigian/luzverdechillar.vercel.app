@@ -102,12 +102,12 @@ export default function EstimateItem({ data, categories }: Props) {
 
   const createdAtString = format(
     data.createdAt as Date,
-    "dd/MM/yyyy"
+    "dd/MM/yyyy HH:mm"
   ).toString()
 
   const updatedAtString = format(
     data.updatedAt as Date,
-    "dd/MM/yyyy - HH:mm"
+    "dd/MM/yyyy HH:mm"
   ).toString()
 
   return (
