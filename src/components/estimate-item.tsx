@@ -22,6 +22,7 @@ import EstimateUpdateFormDialog from "./estimate-update-form"
 import { Service as EstimatesService } from "@/services/estimates.service"
 import Image from "next/image"
 import { Skeleton } from "./ui/skeleton"
+import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import logo from "@/assets/logo.webp"
 import revalidate from "@/lib/actions"
@@ -110,12 +111,21 @@ export default function EstimateItem({ data, categories }: Props) {
     "dd/MM/yyyy HH:mm"
   ).toString()
 
+  const isPast = new Date(data.to).getTime() < Date.now()
+
   return (
-    <li className="col-span-full lg:col-span-2 2xl:col-span-1">
+    <li
+      className={cn(
+        "col-span-full lg:col-span-2 2xl:col-span-1",
+        isPast && "opacity-50"
+      )}
+    >
       <Card className="w-full bg-card/50 hover:bg-card/100 duration-200 ease-in-out">
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-4 truncate">
-            <span className="grow truncate">{personFullname}</span>
+            <span className={cn("grow truncate", isPast && "line-through")}>
+              {personFullname}
+            </span>
             <Badge variant={"default"}>{totalCostString}</Badge>
             <Popover>
               <PopoverTrigger asChild>

@@ -5,11 +5,13 @@ import { Service } from "@/services/estimates.service"
 
 interface Props {
   filter?: string
+  status?: string
   categories: CategoryProps[]
 }
 
 export default async function EstimatesContainer({
   filter,
+  status,
   categories,
 }: Props) {
   const estimates = await Service.getEstimates()
@@ -29,18 +31,29 @@ export default async function EstimatesContainer({
           new Date(item.to).toLocaleDateString("es-AR").includes(filter)
       )
 
+  const filteredByStatus = !status
+    ? filteredData
+    : filteredData.filter((item) => {
+        if (status === "all") return true
+        if (status === "active")
+          return new Date(item.to).getTime() >= Date.now()
+        if (status === "completed")
+          return new Date(item.to).getTime() < Date.now()
+        return false
+      })
+
   return (
     <ul className="grid grid-cols-4 gap-4">
       {estimates.length === 0 ? (
         <li className="col-span-full font-thin">
           No se han registrado prespuestos todavia.
         </li>
-      ) : filteredData.length === 0 ? (
+      ) : filteredByStatus.length === 0 ? (
         <li className="col-span-full font-thin">
           No se encontraron resultados para <strong>{filter}</strong>
         </li>
       ) : (
-        filteredData.map((estimate) => (
+        filteredByStatus.map((estimate) => (
           <EstimateItem
             key={estimate._id}
             data={estimate}
