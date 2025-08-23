@@ -1,6 +1,7 @@
 import EstimatesContainer, {
   EstimatesContainerSkeleton,
 } from "@/components/estimates-container"
+import { RedirectType, redirect } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { CategoryProps } from "@/types/categories.types"
@@ -10,13 +11,22 @@ import Finder from "@/components/finder"
 import { Loader2 } from "lucide-react"
 import { Service } from "@/services/categories.service"
 import { Suspense } from "react"
+import { cookies } from "next/headers"
 
 interface Props {
   searchParams: Promise<{ filter: string; status: string }>
 }
 
 export default async function EstimatesPage({ searchParams }: Props) {
-  const categories = await Service.getCategories()
+  const storedCookies = await cookies()
+  if (!storedCookies) redirect("/", RedirectType.replace)
+
+  const userdata = storedCookies.get("userdata")
+  if (!userdata) redirect("/", RedirectType.push)
+
+  const { access_token: accessToken } = JSON.parse(userdata.value)
+
+  const categories = await Service.getCategories(accessToken)
 
   const { filter, status } = await searchParams
 

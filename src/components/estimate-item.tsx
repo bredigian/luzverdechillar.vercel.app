@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { CategoryProps } from "@/types/categories.types"
+import Cookies from "js-cookie"
 import DialogAdaptative from "./adaptative-dialog"
 import { ErrorResponseProps } from "@/types/responses.types"
 import EstimatePDFDialog from "./estimate-dialog"
@@ -28,6 +29,7 @@ import logo from "@/assets/logo.webp"
 import revalidate from "@/lib/actions"
 import { toast } from "sonner"
 import { useDialog } from "@/hooks/use-dialog"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 type FORM_STATUS = "pending" | "processing" | "success"
@@ -36,11 +38,21 @@ function DeleteEstimate({ _id }: { _id: EstimateProps["_id"] }) {
   const [status, setStatus] = useState<FORM_STATUS>("pending")
   const { open, setOpen, handleOpen } = useDialog()
 
+  const { push } = useRouter()
+
   const handleDelete = async () => {
     try {
       setStatus("processing")
 
-      await EstimatesService.deleteEstimate(_id)
+      const userdata = Cookies.get("userdata")
+      if (!userdata) {
+        push("/")
+        return
+      }
+
+      const { access_token: accessToken } = JSON.parse(userdata)
+
+      await EstimatesService.deleteEstimate(_id, accessToken)
 
       setStatus("success")
       toast.success("Presupuesto eliminado con éxito", {

@@ -24,6 +24,7 @@ import { useEffect, useState } from "react"
 import { Button } from "./ui/button"
 import { CategoryProps } from "@/types/categories.types"
 import { Checkbox } from "./ui/checkbox"
+import Cookies from "js-cookie"
 import CurrencyInput from "react-currency-input-field"
 import CustomInput from "./custom-input"
 import { DateRange } from "react-day-picker"
@@ -41,6 +42,7 @@ import revalidate from "@/lib/actions"
 import { toast } from "sonner"
 import { useDebouncedCallback } from "use-debounce"
 import { useForm } from "react-hook-form"
+import { useRouter } from "next/navigation"
 import { useServicesController } from "@/hooks/use-services"
 
 interface Props {
@@ -139,6 +141,8 @@ export function EstimateForm({ categories, defaultData }: Props) {
     true
   )
 
+  const { push } = useRouter()
+
   useEffect(() => {
     if (!defaultData)
       handleUpdateSelectedServicesOnLocalStorage("services_temp")
@@ -194,9 +198,21 @@ export function EstimateForm({ categories, defaultData }: Props) {
     try {
       setStatus("processing")
 
+      const userdata = Cookies.get("userdata")
+      if (!userdata) {
+        push("/")
+        return
+      }
+
+      const { access_token: accessToken } = JSON.parse(userdata)
+
       const lastEstimate = !defaultData
-        ? await Service.generateEstimate(PAYLOAD)
-        : await Service.updateEstimate(defaultData?._id as string, PAYLOAD)
+        ? await Service.generateEstimate(PAYLOAD, accessToken)
+        : await Service.updateEstimate(
+            defaultData?._id as string,
+            PAYLOAD,
+            accessToken
+          )
 
       setCreatedEstimated(lastEstimate)
 

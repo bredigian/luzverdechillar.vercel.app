@@ -1,7 +1,9 @@
 import EstimateItem, { EstimateItemSkeleton } from "./estimate-item"
+import { RedirectType, redirect } from "next/navigation"
 
 import { CategoryProps } from "@/types/categories.types"
 import { Service } from "@/services/estimates.service"
+import { cookies } from "next/headers"
 
 interface Props {
   filter?: string
@@ -14,7 +16,15 @@ export default async function EstimatesContainer({
   status,
   categories,
 }: Props) {
-  const estimates = await Service.getEstimates()
+  const storedCookies = await cookies()
+  if (!storedCookies) redirect("/", RedirectType.replace)
+
+  const userdata = storedCookies.get("userdata")
+  if (!userdata) redirect("/", RedirectType.push)
+
+  const { access_token: accessToken } = JSON.parse(userdata.value)
+
+  const estimates = await Service.getEstimates(accessToken)
   if ("error" in estimates) return <p>{estimates?.error}</p>
 
   const filteredData = !filter
